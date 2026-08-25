@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RADMIR MARKET</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --bg-0:#07090d; --bg-1:#0d1119; --bg-2:#131828; --line:#232a3d;
+    --gold:#f4b93e; --gold-2:#ffd875; --red:#e0403c; --blue:#3f8ef5;
+    --green:#37c977; --purple:#a970e8; --orange:#f0913c;
+    --text-0:#f4f2ea; --text-1:#b7bccb; --text-2:#767c8f;
+    --shadow-gold: 0 0 22px rgba(244,185,62,.3);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1100px 460px at 50% -10%, #1b2338 0%, var(--bg-0) 55%), var(--bg-0);
+    color:var(--text-0); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh; padding-bottom:86px; overflow-x:hidden;
+  }
+  .heavy{ font-family:"Arial Black","Arial Bold",Impact,sans-serif; text-transform:uppercase; letter-spacing:.5px; }
+  button{ font-family:inherit; }
+
+  /* ---- TOPBAR ---- */
+  .topbar{
+    display:flex; align-items:center; gap:10px; padding:16px 16px 14px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(19,24,40,.6), transparent);
+    position:sticky; top:0; z-index:30; backdrop-filter:blur(6px);
+  }
+  .logo-r{
+    width:38px; height:38px; border-radius:11px; flex-shrink:0;
+    background:linear-gradient(155deg, var(--gold-2), var(--gold) 55%, #b8791a);
+    display:flex; align-items:center; justify-content:center; font-weight:900; font-size:19px;
+    color:#1a1206; font-family:Impact,"Arial Black",sans-serif; box-shadow:var(--shadow-gold);
+  }
+  .topbar .tt{ font-size:16px; letter-spacing:1px; }
+  .topbar .tt b{ color:var(--gold-2); }
+  .admin-pill{
+    margin-left:auto; font-size:11px; font-weight:800; padding:5px 10px; border-radius:20px;
+    background:rgba(224,64,60,.18); border:1px solid rgba(224,64,60,.45); color:#ff8b87; letter-spacing:.5px;
+  }
+
+  main{ padding:14px 16px 30px; }
+  .view{ animation:fadein .22s ease; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .section-label{ display:flex; align-items:center; gap:10px; font-size:12px; letter-spacing:2px; color:var(--text-2); margin:18px 0 10px; }
+  .section-label:first-child{ margin-top:0; }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--line); }
+
+  /* ---- STAT CARDS (menu) ---- */
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .stat-card{ background:var(--bg-1); border:1px solid var(--line); border-radius:14px; padding:14px; }
+  .stat-card .num{ font-size:22px; font-weight:900; color:var(--gold-2); }
+  .stat-card .lbl{ font-size:12px; color:var(--text-2); margin-top:2px; }
+
+  .cta-row{ display:flex; gap:10px; margin-top:14px; }
+  .cta{
+    flex:1; border:none; border-radius:13px; padding:14px 10px; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:6px; font-weight:800; font-size:12.5px;
+    transition:transform .12s ease;
+  }
+  .cta:active{ transform:scale(.95); }
+  .cta.gold{ background:linear-gradient(135deg, var(--gold-2), var(--gold)); color:#1a1206; box-shadow:var(--shadow-gold); }
+  .cta.ghost{ background:var(--bg-1); color:var(--text-0); border:1px solid var(--line); }
+  .cta .ic{ font-size:20px; }
+
+  .hscroll{ display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; margin:0 -16px; padding-left:16px; padding-right:16px; }
+  .hscroll::-webkit-scrollbar{ display:none; }
+  .pin-card{
+    flex:0 0 auto; width:150px; background:var(--bg-1); border:1px solid var(--line); border-radius:14px; padding:12px;
+    border-top:3px solid var(--accent, var(--gold));
+  }
+  .pin-card .ic{ font-size:22px; }
+  .pin-card .nm{ font-size:13px; font-weight:700; margin-top:6px; }
+  .pin-card .pr{ font-size:12px; font-weight:800; color:var(--accent, var(--gold)); margin-top:2px; }
+
+  /* ---- FILTER CHIPS ---- */
+  .chip-row{ display:flex; gap:8px; margin-bottom:12px; overflow-x:auto; }
+  .chip{
+    flex:0 0 auto; padding:8px 14px; border-radius:20px; font-size:12.5px; font-weight:700;
+    background:var(--bg-1); border:1px solid var(--line); color:var(--text-1); cursor:pointer;
+  }
+  .chip.active{ background:color-mix(in srgb, var(--gold) 20%, var(--bg-0)); border-color:var(--gold); color:var(--gold-2); }
+
+  /* ---- PRODUCT CARD ---- */
+  .prod-list{ display:flex; flex-direction:column; gap:10px; }
+  .prod-card{
+    position:relative; display:flex; gap:12px; padding:12px 12px 12px 14px;
+    background:linear-gradient(180deg, var(--bg-2), var(--bg-1)); border:1px solid var(--line);
+    border-radius:14px; overflow:hidden;
+  }
+  .prod-card::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--accent, var(--gold)); }
+  .prod-card.blocked{ opacity:.5; }
+  .prod-icon{
+    width:44px; height:44px; border-radius:11px; flex-shrink:0; font-size:21px;
+    display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--accent) 18%, var(--bg-0));
+    border:1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+  }
+  .prod-body{ flex:1; min-width:0; }
+  .prod-name{ font-size:15px; font-weight:700; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .tag{ font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:8px; letter-spacing:.3px; }
+  .tag.pin{ background:rgba(244,185,62,.18); color:var(--gold-2); border:1px solid rgba(244,185,62,.4); }
+  .tag.blk{ background:rgba(224,64,60,.18); color:#ff8b87; border:1px solid rgba(224,64,60,.4); }
+  .prod-desc{ font-size:12px; color:var(--text-1); margin-top:3px; line-height:1.35; }
+  .prod-meta{ font-size:11px; color:var(--text-2); margin-top:5px; }
+  .prod-price{ font-size:14px; font-weight:900; color:var(--accent, var(--gold)); margin-top:6px; }
+  .prod-actions{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+  .mini-btn{
+    border:none; border-radius:9px; padding:8px 12px; font-size:12px; font-weight:800; cursor:pointer;
+    transition:transform .1s ease;
+  }
+  .mini-btn:active{ transform:scale(.92); }
+  .mini-btn.buy{ background:linear-gradient(135deg, var(--gold-2), var(--gold)); color:#1a1206; }
+  .mini-btn.del{ background:rgba(224,64,60,.16); color:#ff8b87; border:1px solid rgba(224,64,60,.4); }
+  .mini-btn.pin{ background:rgba(244,185,62,.14); color:var(--gold-2); border:1px solid rgba(244,185,62,.35); }
+  .mini-btn.blk{ background:var(--bg-0); color:var(--text-1); border:1px solid var(--line); }
+
+  .fab{
+    position:fixed; right:18px; bottom:96px; z-index:35;
+    width:54px; height:54px; border-radius:50%; border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--gold-2), var(--gold)); color:#1a1206;
+    font-size:26px; font-weight:900; box-shadow:0 10px 26px rgba(244,185,62,.4);
+    display:flex; align-items:center; justify-content:center; transition:transform .15s ease;
+  }
+  .fab:active{ transform:scale(.88) rotate(90deg); }
+
+  /* ---- PROFILE ---- */
+  .profile-hero{ display:flex; align-items:center; gap:12px; padding:16px; background:var(--bg-1); border:1px solid var(--line); border-radius:16px; }
+  .avatar{
+    width:52px; height:52px; border-radius:50%; flex-shrink:0; font-size:22px; font-weight:900;
+    display:flex; align-items:center; justify-content:center; color:#1a1206;
+    background:linear-gradient(135deg, var(--gold-2), var(--gold));
+  }
+  .profile-hero .nm{ font-size:16px; font-weight:800; }
+  .profile-hero .sub{ font-size:12px; color:var(--text-2); }
+  .logout-btn{ margin-left:auto; background:var(--bg-0); border:1px solid var(--line); color:var(--text-1); border-radius:10px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+
+  .empty-state{ text-align:center; padding:26px 10px; color:var(--text-2); font-size:13px; }
+  .empty-state .ic{ font-size:30px; display:block; margin-bottom:8px; }
+
+  .order-card{
+    background:var(--bg-1); border:1px solid var(--line); border-radius:13px; padding:12px; margin-bottom:10px;
+  }
+  .order-card .top-row{ display:flex; justify-content:space-between; align-items:center; }
+  .order-card .prod{ font-weight:800; font-size:13.5px; }
+  .status-badge{ font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:8px; }
+  .status-badge.new{ background:rgba(63,142,245,.16); color:#7fb3fb; }
+  .status-badge.done{ background:rgba(55,201,119,.16); color:#6fe3a4; }
+  .order-card .meta{ font-size:12px; color:var(--text-1); margin-top:6px; line-height:1.5; }
+  .order-card .meta b{ color:var(--text-0); }
+
+  .admin-box{ background:rgba(224,64,60,.06); border:1px solid rgba(224,64,60,.28); border-radius:16px; padding:14px; }
+  .pin-input-row{ display:flex; gap:8px; }
+  .pin-input-row input{ flex:1; }
+  .user-row{
+    display:flex; align-items:center; justify-content:between; gap:10px; padding:10px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .user-row .un{ flex:1; font-size:13.5px; font-weight:700; }
+  .user-row .cnt{ font-size:11px; color:var(--text-2); }
+
+  input.field-input, textarea.field-input, select.field-input{
+    width:100%; margin-top:6px; padding:12px; border-radius:11px;
+    background:var(--bg-0); border:1px solid var(--line); color:var(--text-0);
+    font-size:14.5px; outline:none; font-family:inherit;
+  }
+  input.field-input:focus, textarea.field-input:focus, select.field-input:focus{ border-color:var(--gold); }
+  textarea.field-input{ resize:none; min-height:60px; }
+  label.field{ display:block; margin-top:12px; font-size:12.5px; color:var(--text-2); }
+
+  .emoji-pick{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .emoji-opt{
+    width:40px; height:40px; border-radius:10px; background:var(--bg-0); border:1px solid var(--line);
+    font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .emoji-opt.sel{ border-color:var(--gold); background:rgba(244,185,62,.14); }
+
+  .submit-btn{
+    width:100%; margin-top:16px; border:none; border-radius:14px; padding:14px;
+    background:linear-gradient(135deg, var(--gold-2), var(--gold)); color:#1a1206; font-weight:900; font-size:15px;
+    cursor:pointer; box-shadow:var(--shadow-gold); transition:transform .12s ease;
+  }
+  .submit-btn:active{ transform:scale(.97); }
+  .submit-btn.outline{ background:var(--bg-0); color:var(--text-0); border:1px solid var(--line); box-shadow:none; }
+
+  /* ---- TABBAR ---- */
+  .tabbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex;
+    background:linear-gradient(180deg, #10141f, #0a0d14); border-top:1px solid var(--line);
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  }
+  .tab-btn{
+    flex:1; background:none; border:none; color:var(--text-2); display:flex; flex-direction:column;
+    align-items:center; gap:3px; padding:6px 0; font-size:10.5px; font-weight:700; cursor:pointer;
+  }
+  .tab-btn .ic{ font-size:20px; }
+  .tab-btn.active{ color:var(--gold-2); }
+
+  /* ---- MODAL ---- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(4,5,9,.72); backdrop-filter:blur(2px);
+    display:flex; align-items:flex-end; justify-content:center; z-index:80; opacity:0; pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  .overlay.open{ opacity:1; pointer-events:auto; }
+  .sheet{
+    width:100%; max-width:480px; background:var(--bg-1); border:1px solid var(--line); border-bottom:none;
+    border-radius:22px 22px 0 0; padding:18px 18px 24px; transform:translateY(100%);
+    transition:transform .32s cubic-bezier(.2,.9,.25,1.1); max-height:88vh; overflow-y:auto;
+  }
+  .overlay.open .sheet{ transform:translateY(0); }
+  .sheet-handle{ width:40px; height:4px; border-radius:3px; background:var(--line); margin:0 auto 14px; }
+  .sheet h2{ margin:0 0 4px; font-size:19px; }
+  .sheet .muted{ color:var(--text-2); font-size:13px; margin-bottom:6px; }
+  .close-x{
+    position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%;
+    background:var(--bg-0); border:1px solid var(--line); color:var(--text-1);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px;
+  }
+
+  .success-wrap{ text-align:center; padding:14px 6px 6px; }
+  .check-circle{ width:64px; height:64px; border-radius:50%; margin:0 auto 14px; background:radial-gradient(circle, rgba(55,201,119,.25), transparent 70%); display:flex; align-items:center; justify-content:center; }
+  .check-circle svg{ width:48px; height:48px; }
+  .check-circle circle{ stroke:var(--green); stroke-width:3; fill:none; stroke-dasharray:151; stroke-dashoffset:151; animation:circle-draw .5s ease forwards; }
+  .check-circle path{ stroke:var(--green); stroke-width:3.5; fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:30; stroke-dashoffset:30; animation:check-draw .3s ease forwards .5s; }
+  @keyframes circle-draw{ to{ stroke-dashoffset:0; } }
+  @keyframes check-draw{ to{ stroke-dashoffset:0; } }
+
+  .toast{
+    position:fixed; left:50%; top:14px; transform:translate(-50%,-140%); background:var(--bg-2);
+    border:1px solid var(--line); color:var(--text-0); padding:10px 16px; border-radius:12px; font-size:13px;
+    z-index:100; transition:transform .3s cubic-bezier(.2,.9,.25,1.2); box-shadow:0 8px 24px rgba(0,0,0,.4);
+    max-width:88vw; text-align:center;
+  }
+  .toast.show{ transform:translate(-50%,0); }
+
+  .loading-screen{
+    position:fixed; inset:0; background:var(--bg-0); z-index:200; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:12px; transition:opacity .3s ease;
+  }
+  .spinner{ width:34px; height:34px; border-radius:50%; border:3px solid var(--line); border-top-color:var(--gold); animation:spin .8s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .loading-screen .txt{ color:var(--text-2); font-size:13px; }
+</style>
+</head>
+<body>
+
+<div id="loadingScreen" class="loading-screen">
+  <div class="spinner"></div>
+  <div class="txt">Bozor yuklanmoqda...</div>
+</div>
+
+<header class="topbar">
+  <div class="logo-r">R</div>
+  <div class="tt heavy">RADMIR <b>MARKET</b></div>
+  <div class="admin-pill" id="adminPill" style="display:none;">🛡️ ADMIN</div>
+</header>
+
+<main>
+  <!-- ===================== MENU VIEW ===================== -->
+  <section class="view" id="view-menu">
+    <p class="section-label">UMUMIY HOLAT</p>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num" id="statProducts">0</div><div class="lbl">Faol mahsulot</div></div>
+      <div class="stat-card"><div class="num" id="statSellers">0</div><div class="lbl">Sotuvchilar</div></div>
+      <div class="stat-card"><div class="num" id="statOrders">0</div><div class="lbl">Jami buyurtma</div></div>
+      <div class="stat-card"><div class="num" id="statOfficial">0</div><div class="lbl">Rasmiy xizmat</div></div>
+    </div>
+
+    <div class="cta-row">
+      <button class="cta gold" id="ctaAdd"><span class="ic">➕</span>Mahsulot qo'yish</button>
+      <button class="cta ghost" id="ctaGoShop"><span class="ic">🛍️</span>Do'konga o'tish</button>
+    </div>
+
+    <p class="section-label">RASMIY XIZMATLAR</p>
+    <div class="hscroll" id="pinnedScroll"></div>
+
+    <p class="section-label">SO'NGGI QO'SHILGANLAR</p>
+    <div class="prod-list" id="recentList"></div>
+  </section>
+
+  <!-- ===================== SHOP VIEW ===================== -->
+  <section class="view" id="view-shop" style="display:none;">
+    <div class="chip-row" id="chipRow">
+      <div class="chip active" data-cat="all">Hammasi</div>
+      <div class="chip" data-cat="xizmat">Xizmatlar</div>
+      <div class="chip" data-cat="tovar">Tovarlar</div>
+    </div>
+    <div class="prod-list" id="shopList"></div>
+  </section>
+
+  <!-- ===================== PROFILE VIEW ===================== -->
+  <section class="view" id="view-profile" style="display:none;">
+    <div id="noNameBlock">
+      <p class="section-label">PROFIL</p>
+      <label class="field">Ismingiz / nikingiz</label>
+      <input class="field-input" id="fMyName" placeholder="Masalan: Sardor_99">
+      <label class="field">Telegram username (bog'lanish uchun)</label>
+      <input class="field-input" id="fMyTg" placeholder="@sizning_username">
+      <button class="submit-btn" id="saveNameBtn">Saqlash va davom etish</button>
+    </div>
+
+    <div id="hasNameBlock" style="display:none;">
+      <div class="profile-hero">
+        <div class="avatar" id="avatarLetter">?</div>
+        <div>
+          <div class="nm" id="profileName">—</div>
+          <div class="sub" id="profileTg">—</div>
+        </div>
+        <button class="logout-btn" id="logoutBtn">Chiqish</button>
+      </div>
+
+      <p class="section-label">MENING MAHSULOTLARIM</p>
+      <div class="prod-list" id="myProductsList"></div>
+
+      <p class="section-label">MENGA TUSHGAN BUYURTMALAR</p>
+      <div id="incomingOrdersList"></div>
+
+      <p class="section-label">MEN BERGAN BUYURTMALAR</p>
+      <div id="myOrdersList"></div>
+
+      <p class="section-label">ADMINISTRATOR</p>
+      <div class="admin-box" id="adminLoginBox">
+        <div class="muted" style="color:var(--text-1); font-size:12.5px; margin-bottom:10px;">Admin kodi orqali foydalanuvchilarni bloklash va mahsulotlarni boshqarish mumkin.</div>
+        <div class="pin-input-row">
+          <input class="field-input" id="fPin" placeholder="Admin kodi" type="password" style="margin-top:0;">
+          <button class="submit-btn" id="pinSubmit" style="width:auto; margin-top:0; padding:0 18px;">Kirish</button>
+        </div>
+      </div>
+
+      <div id="adminPanel" style="display:none;">
+        <div class="admin-box">
+          <p class="section-label" style="margin-top:0;">FOYDALANUVCHILAR</p>
+          <div id="userAdminList"></div>
+        </div>
+        <div class="admin-box" style="margin-top:12px;">
+          <p class="section-label" style="margin-top:0;">BARCHA MAHSULOTLAR</p>
+          <div class="prod-list" id="adminProductsList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<button class="fab" id="fabAdd" style="display:none;">+</button>
+
+<nav class="tabbar">
+  <button class="tab-btn active" data-tab="menu"><span class="ic">🏠</span>Menyu</button>
+  <button class="tab-btn" data-tab="shop"><span class="ic">🛍️</span>Do'kon</button>
+  <button class="tab-btn" data-tab="profile"><span class="ic">👤</span>Profil</button>
+</nav>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="overlay" id="addOverlay">
+  <div class="sheet">
+    <div class="close-x" id="closeAdd">✕</div>
+    <div class="sheet-handle"></div>
+    <h2 class="heavy">MAHSULOT QO'SHISH</h2>
+    <p class="muted">Sotmoqchi bo'lgan narsangizni bozorga qo'ying.</p>
+
+    <label class="field">Nomi</label>
+    <input class="field-input" id="pName" placeholder="Masalan: Uy-joy, Mashina, Xizmat...">
+
+    <label class="field">Narxi (so'm)</label>
+    <input class="field-input" id="pPrice" type="number" placeholder="Masalan: 250000">
+
+    <label class="field">Tavsif</label>
+    <textarea class="field-input" id="pDesc" placeholder="Qisqacha tavsif yozing"></textarea>
+
+    <label class="field">Turkum</label>
+    <select class="field-input" id="pCat">
+      <option value="xizmat">Xizmat</option>
+      <option value="tovar">Tovar</option>
+    </select>
+
+    <label class="field">Belgi tanlang</label>
+    <div class="emoji-pick" id="emojiPick"></div>
+
+    <button class="submit-btn" id="submitProduct">Bozorga qo'yish</button>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="overlay" id="orderOverlay">
+  <div class="sheet">
+    <div class="close-x" id="closeOrder">✕</div>
+    <div class="sheet-handle"></div>
+    <div id="orderFormView">
+      <h2 class="heavy">BUYURTMA BERISH</h2>
+      <p class="muted" id="orderProductLabel">—</p>
+
+      <label class="field">Izoh (ixtiyoriy)</label>
+      <textarea class="field-input" id="oNote" placeholder="Sotuvchiga xabar qoldiring"></textarea>
+
+      <button class="submit-btn" id="submitOrderBtn">🛒 Buyurtmani jo'natish</button>
+    </div>
+    <div id="orderSuccessView" style="display:none;">
+      <div class="success-wrap">
+        <div class="check-circle">
+          <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"></circle><path d="M15 27 L23 35 L38 18"></path></svg>
+        </div>
+        <h3 class="heavy">BUYURTMA YUBORILDI!</h3>
+        <p style="color:var(--text-1); font-size:13.5px;">Sotuvchi buyurtmangizni ko'radi va siz bilan bog'lanadi.</p>
+        <button class="submit-btn" id="closeOrderSuccess" style="margin-top:16px;">Yaxshi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const tg = window.Telegram ? window.Telegram.WebApp : null;
+if (tg) { try { tg.ready(); tg.expand(); } catch(e){} }
+
+// ---------------- CONFIG ----------------
+const ADMIN_PIN = "7799";              // <-- shu kodni faqat o'zingiz biling, adminlikka kirish uchun shu ishlatiladi
+const ACCENTS = ["var(--red)","var(--blue)","var(--orange)","var(--green)","var(--purple)","var(--gold)"];
+const EMOJIS = ["🛡️","🚔","📡","⚕️","🔑","🏛️","⭐","🚗","🏠","📱","💎","🛠️","🎮","👕","🍔","📦"];
+
+const SEED_PRODUCTS = [
+  { id:"fsb",  name:"FSB",         icon:"🛡️", price:700000, desc:"Davlat xavfsizlik tashkilotiga kirish xizmati.", cat:"xizmat", seller:"Radmir RP", tg:"uzbekovichh", pinned:true, blocked:false, createdAt:1 },
+  { id:"mvd",  name:"MVD",         icon:"🚔", price:500000, desc:"Ichki ishlar tashkilotiga kirish xizmati.",       cat:"xizmat", seller:"Radmir RP", tg:"uzbekovichh", pinned:true, blocked:false, createdAt:2 },
+  { id:"ritm", name:"TRK RITM",    icon:"📡", price:350000, desc:"Media tashkilotiga kirish xizmati.",              cat:"xizmat", seller:"Radmir RP", tg:"uzbekovichh", pinned:true, blocked:false, createdAt:3 },
+  { id:"hosp", name:"Bo'lnitsa",   icon:"⚕️", price:300000, desc:"Tibbiyot tashkilotiga kirish xizmati.",           cat:"xizmat", seller:"Radmir RP", tg:"uzbekovichh", pinned:true, blocked:false, createdAt:4 },
+  { id:"fsin", name:"FSIN",        icon:"🔑", price:500000, desc:"Jazoni ijro etish tashkilotiga kirish xizmati.",  cat:"xizmat", seller:"Radmir RP", tg:"uzbekovichh", pinned:true, blocked:false, createdAt:5 },
+  { id:"gov",  name:"Pravitelstvo",icon:"🏛️", price:500000, desc:"Hukumat tashkilotiga kirish xizmati.",           cat:"xizmat", seller:"Radmir RP", tg:"uzbekovichh", pinned:true, blocked:false, createdAt:6 },
+  { id:"army", name:"Armiya",      icon:"⭐", price:300000, desc:"Armiya tashkilotiga kirish xizmati.",             cat:"xizmat", seller:"Radmir RP", tg:"uzbekovichh", pinned:true, blocked:false, createdAt:7 },
+];
+
+// ---------------- STATE ----------------
+let products = [];
+let orders = [];
+let blockedSellers = [];
+let myName = "";
+let myTg = "";
+let isAdmin = false;
+let activeTab = "menu";
+let activeCat = "all";
+let selectedEmoji = EMOJIS[0];
+let pendingOrderProductId = null;
+
+// ---------------- STORAGE HELPERS (real backend API) ----------------
+// Bu ilova endi window.storage (faqat Claude ichida ishlaydi) o'rniga
+// o'zimizning server.js orqali /api/... manzillariga so'rov yuboradi,
+// shuning uchun GitHub/Railway/Render kabi joyларда ham ma'lumot saqlanadi.
+function mapKeyToEndpoint(key){
+  if (key === "marketplace-products") return "/api/products";
+  if (key === "marketplace-orders") return "/api/orders";
+  if (key === "marketplace-blocked") return "/api/blocked";
+  return "/api/" + key;
+}
+async function loadKey(key, fallback){
+  try{
+    const res = await fetch(mapKeyToEndpoint(key));
+    if (!res.ok) return fallback;
+    const data = await res.json();
+    return (data && data.value !== undefined && data.value !== null) ? data.value : fallback;
+  }catch(e){
+    console.error("Load error on", key, e);
+    return fallback;
+  }
+}
+async function saveKey(key, value){
+  try{
+    const res = await fetch(mapKeyToEndpoint(key), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ value })
+    });
+    if (!res.ok) console.error("Save failed for", key);
+    return res.ok;
+  }catch(e){
+    console.error("Storage error on", key, e);
+    showToast("Saqlashda xatolik yuz berdi, internetni tekshiring");
+    return false;
+  }
+}
+
+function accentFor(idOrCat){
+  let sum = 0;
+  for (const ch of String(idOrCat)) sum += ch.charCodeAt(0);
+  return ACCENTS[sum % ACCENTS.length];
+}
+
+function fmt(n){ return Number(n).toLocaleString("ru-RU").replace(/,/g," ") + " so'm"; }
+
+function haptic(style){
+  if (tg && tg.HapticFeedback){ try{ tg.HapticFeedback.impactOccurred(style||"light"); }catch(e){} }
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2400);
+}
+
+// ---------------- INIT ----------------
+async function init(){
+  products = await loadKey("marketplace-products", null);
+  if (!products){
+    products = SEED_PRODUCTS.slice();
+    await saveKey("marketplace-products", products);
+  }
+  orders = await loadKey("marketplace-orders", []);
+  blockedSellers = await loadKey("marketplace-blocked", []);
+
+  buildEmojiPicker();
+  renderAll();
+  document.getElementById("loadingScreen").style.opacity = "0";
+  setTimeout(()=>{ document.getElementById("loadingScreen").style.display = "none"; }, 300);
+}
+
+// ---------------- RENDER ----------------
+function renderAll(){
+  renderMenu();
+  renderShop();
+  renderProfile();
+}
+
+function renderMenu(){
+  const active = products.filter(p=>!p.blocked);
+  const sellers = new Set(active.map(p=>p.seller));
+  document.getElementById("statProducts").textContent = active.length;
+  document.getElementById("statSellers").textContent = sellers.size;
+  document.getElementById("statOrders").textContent = orders.length;
+  document.getElementById("statOfficial").textContent = active.filter(p=>p.pinned).length;
+
+  const pinnedScroll = document.getElementById("pinnedScroll");
+  pinnedScroll.innerHTML = "";
+  active.filter(p=>p.pinned).forEach(p=>{
+    const el = document.createElement("div");
+    el.className = "pin-card";
+    el.style.setProperty("--accent", accentFor(p.id));
+    el.innerHTML = `<div class="ic">${p.icon}</div><div class="nm">${escapeHtml(p.name)}</div><div class="pr">${fmt(p.price)}</div>`;
+    el.addEventListener("click", ()=> switchTab("shop"));
+    pinnedScroll.appendChild(el);
+  });
+
+  const recentList = document.getElementById("recentList");
+  const recent = active.filter(p=>!p.pinned).sort((a,b)=>b.createdAt-a.createdAt).slice(0,4);
+  recentList.innerHTML = "";
+  if (recent.length === 0){
+    recentList.innerHTML = `<div class="empty-state"><span class="ic">🗃️</span>Hozircha foydalanuvchilar mahsulot qo'shmagan</div>`;
+  } else {
+    recent.forEach(p=> recentList.appendChild(buildProductCard(p, {mode:"shop"})));
+  }
+}
+
+function renderShop(){
+  const list = document.getElementById("shopList");
+  list.innerHTML = "";
+  let items = products.filter(p=>!p.blocked);
+  if (activeCat !== "all") items = items.filter(p=>p.cat === activeCat);
+  items = items.slice().sort((a,b)=> (b.pinned - a.pinned) || (b.createdAt - a.createdAt));
+
+  if (items.length === 0){
+    list.innerHTML = `<div class="empty-state"><span class="ic">🛒</span>Bu turkumda hozircha mahsulot yo'q</div>`;
+    return;
+  }
+  items.forEach(p=> list.appendChild(buildProductCard(p, {mode:"shop"})));
+}
+
+function buildProductCard(p, opts){
+  const card = document.createElement("div");
+  card.className = "prod-card" + (p.blocked ? " blocked" : "");
+  card.style.setProperty("--accent", accentFor(p.id));
+  const tags = [];
+  if (p.pinned) tags.push(`<span class="tag pin">RASMIY</span>`);
+  if (p.blocked) tags.push(`<span class="tag blk">BLOKLANGAN</span>`);
+
+  card.innerHTML = `
+    <div class="prod-icon">${p.icon}</div>
+    <div class="prod-body">
+      <div class="prod-name">${escapeHtml(p.name)} ${tags.join(" ")}</div>
+      <div class="prod-desc">${escapeHtml(p.desc||"")}</div>
+      <div class="prod-meta">Sotuvchi: ${escapeHtml(p.seller)}</div>
+      <div class="prod-price">${fmt(p.price)}</div>
+      <div class="prod-actions" data-id="${p.id}"></div>
+    </div>
+  `;
+  const actions = card.querySelector(".prod-actions");
+
+  if (opts.mode === "shop"){
+    const buyBtn = document.createElement("button");
+    buyBtn.className = "mini-btn buy";
+    buyBtn.textContent = "Buyurtma berish";
+    buyBtn.addEventListener("click", ()=> openOrderModal(p.id));
+    actions.appendChild(buyBtn);
+  }
+  if (opts.mode === "mine"){
+    const delBtn = document.createElement("button");
+    delBtn.className = "mini-btn del";
+    delBtn.textContent = "O'chirish";
+    if (p.pinned && !isAdmin){
+      delBtn.disabled = true;
+      delBtn.style.opacity = ".4";
+      delBtn.title = "Rasmiy mahsulotni faqat admin o'chira oladi";
+    } else {
+      delBtn.addEventListener("click", ()=> deleteProduct(p.id));
+    }
+    actions.appendChild(delBtn);
+  }
+  if (opts.mode === "admin"){
+    const pinBtn = document.createElement("button");
+    pinBtn.className = "mini-btn pin";
+    pinBtn.textContent = p.pinned ? "Yechish" : "Mahkamlash";
+    pinBtn.addEventListener("click", ()=> togglePin(p.id));
+    actions.appendChild(pinBtn);
+
+    const blkBtn = document.createElement("button");
+    blkBtn.className = "mini-btn blk";
+    blkBtn.textContent = p.blocked ? "Ochish" : "Bloklash";
+    blkBtn.addEventListener("click", ()=> toggleBlockProduct(p.id));
+    actions.appendChild(blkBtn);
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "mini-btn del";
+    delBtn.textContent = "O'chirish";
+    delBtn.addEventListener("click", ()=> deleteProduct(p.id));
+    actions.appendChild(delBtn);
+  }
+  return card;
+}
+
+function renderProfile(){
+  document.getElementById("noNameBlock").style.display = myName ? "none" : "block";
+  document.getElementById("hasNameBlock").style.display = myName ? "block" : "none";
+  if (!myName) return;
+
+  document.getElementById("avatarLetter").textContent = myName.charAt(0).toUpperCase();
+  document.getElementById("profileName").textContent = myName;
+  document.getElementById("profileTg").textContent = myTg ? ("@"+myTg.replace(/^@/,"")) : "Telegram kiritilmagan";
+
+  const myProducts = products.filter(p=>p.seller === myName);
+  const myList = document.getElementById("myProductsList");
+  myList.innerHTML = "";
+  if (myProducts.length === 0){
+    myList.innerHTML = `<div class="empty-state"><span class="ic">📦</span>Siz hali mahsulot qo'ymagansiz</div>`;
+  } else {
+    myProducts.forEach(p=> myList.appendChild(buildProductCard(p, {mode:"mine"})));
+  }
+
+  const incoming = orders.filter(o=>o.sellerName === myName).sort((a,b)=>b.createdAt-a.createdAt);
+  const inWrap = document.getElementById("incomingOrdersList");
+  inWrap.innerHTML = "";
+  if (incoming.length === 0){
+    inWrap.innerHTML = `<div class="empty-state"><span class="ic">📭</span>Sizga hali buyurtma tushmagan</div>`;
+  } else {
+    incoming.forEach(o=> inWrap.appendChild(buildOrderCard(o, true)));
+  }
+
+  const mine = orders.filter(o=>o.buyerName === myName).sort((a,b)=>b.createdAt-a.createdAt);
+  const myOWrap = document.getElementById("myOrdersList");
+  myOWrap.innerHTML = "";
+  if (mine.length === 0){
+    myOWrap.innerHTML = `<div class="empty-state"><span class="ic">🧾</span>Siz hali buyurtma bermagansiz</div>`;
+  } else {
+    mine.forEach(o=> myOWrap.appendChild(buildOrderCard(o, false)));
+  }
+
+  document.getElementById("adminPill").style.display = isAdmin ? "block" : "none";
+  document.getElementById("adminLoginBox").style.display = isAdmin ? "none" : "block";
+  document.getElementById("adminPanel").style.display = isAdmin ? "block" : "none";
+  if (isAdmin) renderAdminPanel();
+}
+
+function buildOrderCard(o, isSeller){
+  const card = document.createElement("div");
+  card.className = "order-card";
+  const otherName = isSeller ? o.buyerName : o.sellerName;
+  const otherTg = isSeller ? o.buyerTg : o.sellerTg;
+  card.innerHTML = `
+    <div class="top-row">
+      <div class="prod">${escapeHtml(o.productName)}</div>
+      <span class="status-badge ${o.status==='done'?'done':'new'}">${o.status==='done' ? "Bog'lanildi" : "Yangi"}</span>
+    </div>
+    <div class="meta">
+      <b>${isSeller ? "Xaridor" : "Sotuvchi"}:</b> ${escapeHtml(otherName)} ${otherTg ? "(@"+escapeHtml(otherTg.replace(/^@/,""))+")" : ""}<br>
+      ${o.note ? "<b>Izoh:</b> " + escapeHtml(o.note) : ""}
+    </div>
+    <div class="prod-actions" style="margin-top:8px;"></div>
+  `;
+  const actions = card.querySelector(".prod-actions");
+  if (otherTg){
+    const contactBtn = document.createElement("button");
+    contactBtn.className = "mini-btn buy";
+    contactBtn.textContent = "Telegramda yozish";
+    contactBtn.addEventListener("click", ()=> window.open("https://t.me/"+otherTg.replace(/^@/,""), "_blank"));
+    actions.appendChild(contactBtn);
+  }
+  if (isSeller && o.status !== "done"){
+    const doneBtn = document.createElement("button");
+    doneBtn.className = "mini-btn blk";
+    doneBtn.textContent = "Bog'landim deb belgilash";
+    doneBtn.addEventListener("click", ()=> markOrderDone(o.id));
+    actions.appendChild(doneBtn);
+  }
+  return card;
+}
+
+function renderAdminPanel(){
+  const sellerMap = {};
+  products.forEach(p=>{
+    if (!sellerMap[p.seller]) sellerMap[p.seller] = 0;
+    sellerMap[p.seller]++;
+  });
+  const userList = document.getElementById("userAdminList");
+  userList.innerHTML = "";
+  const names = Object.keys(sellerMap).filter(n=>n !== "Radmir RP");
+  if (names.length === 0){
+    userList.innerHTML = `<div class="empty-state"><span class="ic">👥</span>Hali foydalanuvchi mahsulot qo'ymagan</div>`;
+  } else {
+    names.forEach(name=>{
+      const row = document.createElement("div");
+      row.className = "user-row";
+      const blocked = blockedSellers.includes(name);
+      row.innerHTML = `<div class="un">${escapeHtml(name)} <span class="cnt">(${sellerMap[name]} ta mahsulot)</span></div>`;
+      const btn = document.createElement("button");
+      btn.className = "mini-btn " + (blocked ? "buy" : "del");
+      btn.textContent = blocked ? "Blokdan chiqarish" : "Bloklash";
+      btn.addEventListener("click", ()=> toggleBlockSeller(name));
+      row.appendChild(btn);
+      userList.appendChild(row);
+    });
+  }
+
+  const adminProducts = document.getElementById("adminProductsList");
+  adminProducts.innerHTML = "";
+  products.slice().sort((a,b)=>b.createdAt-a.createdAt).forEach(p=>{
+    adminProducts.appendChild(buildProductCard(p, {mode:"admin"}));
+  });
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+
+// ---------------- TABS ----------------
+function switchTab(tab){
+  activeTab = tab;
+  document.getElementById("view-menu").style.display = tab === "menu" ? "block" : "none";
+  document.getElementById("view-shop").style.display = tab === "shop" ? "block" : "none";
+  document.getElementById("view-profile").style.display = tab === "profile" ? "block" : "none";
+  document.querySelectorAll(".tab-btn").forEach(b=> b.classList.toggle("active", b.dataset.tab === tab));
+  document.getElementById("fabAdd").style.display = tab === "shop" ? "flex" : "none";
+}
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{ haptic("light"); switchTab(btn.dataset.tab); });
+});
+document.getElementById("ctaGoShop").addEventListener("click", ()=> switchTab("shop"));
+
+// ---------------- EMOJI PICKER ----------------
+function buildEmojiPicker(){
+  const wrap = document.getElementById("emojiPick");
+  wrap.innerHTML = "";
+  EMOJIS.forEach(e=>{
+    const el = document.createElement("div");
+    el.className = "emoji-opt" + (e === selectedEmoji ? " sel" : "");
+    el.textContent = e;
+    el.addEventListener("click", ()=>{
+      selectedEmoji = e;
+      wrap.querySelectorAll(".emoji-opt").forEach(o=>o.classList.remove("sel"));
+      el.classList.add("sel");
+    });
+    wrap.appendChild(el);
+  });
+}
+
+// ---------------- ADD PRODUCT ----------------
+function openAddModal(){
+  if (!myName){
+    showToast("Avval Profil bo'limida ismingizni kiriting");
+    switchTab("profile");
+    return;
+  }
+  if (blockedSellers.includes(myName)){
+    showToast("Siz administrator tomonidan bloklangansiz, mahsulot qo'sha olmaysiz");
+    return;
+  }
+  document.getElementById("pName").value = "";
+  document.getElementById("pPrice").value = "";
+  document.getElementById("pDesc").value = "";
+  document.getElementById("pCat").value = "xizmat";
+  selectedEmoji = EMOJIS[0];
+  buildEmojiPicker();
+  document.getElementById("addOverlay").classList.add("open");
+}
+document.getElementById("ctaAdd").addEventListener("click", openAddModal);
+document.getElementById("fabAdd").addEventListener("click", openAddModal);
+document.getElementById("closeAdd").addEventListener("click", ()=> document.getElementById("addOverlay").classList.remove("open"));
+
+document.getElementById("submitProduct").addEventListener("click", async ()=>{
+  const name = document.getElementById("pName").value.trim();
+  const price = Number(document.getElementById("pPrice").value);
+  const desc = document.getElementById("pDesc").value.trim();
+  const cat = document.getElementById("pCat").value;
+
+  if (!name){ showToast("Mahsulot nomini kiriting"); return; }
+  if (!price || price <= 0){ showToast("To'g'ri narx kiriting"); return; }
+
+  const btn = document.getElementById("submitProduct");
+  btn.disabled = true; btn.textContent = "Saqlanmoqda...";
+
+  const newProduct = {
+    id: "p" + Date.now(),
+    name, price, desc, cat,
+    icon: selectedEmoji,
+    seller: myName,
+    tg: myTg,
+    pinned: false,
+    blocked: false,
+    createdAt: Date.now()
+  };
+  products.push(newProduct);
+  const ok = await saveKey("marketplace-products", products);
+  btn.disabled = false; btn.textContent = "Bozorga qo'yish";
+
+  if (ok){
+    document.getElementById("addOverlay").classList.remove("open");
+    haptic("medium");
+    showToast("Mahsulot bozorga qo'yildi!");
+    renderAll();
+  } else {
+    products.pop();
+  }
+});
+
+async function deleteProduct(id){
+  const p = products.find(x=>x.id===id);
+  if (!p) return;
+  if (p.pinned && !isAdmin){ showToast("Rasmiy mahsulotni faqat admin o'chira oladi"); return; }
+  const backup = products.slice();
+  products = products.filter(x=>x.id!==id);
+  const ok = await saveKey("marketplace-products", products);
+  if (ok){ showToast("Mahsulot o'chirildi"); renderAll(); } else { products = backup; }
+}
+
+// ---------------- ORDER ----------------
+function openOrderModal(productId){
+  if (!myName){
+    showToast("Buyurtma berish uchun avval Profil bo'limida ismingizni kiriting");
+    switchTab("profile");
+    return;
+  }
+  const p = products.find(x=>x.id===productId);
+  if (!p) return;
+  pendingOrderProductId = productId;
+  document.getElementById("orderProductLabel").textContent = `${p.icon} ${p.name} — ${fmt(p.price)}`;
+  document.getElementById("oNote").value = "";
+  document.getElementById("orderFormView").style.display = "block";
+  document.getElementById("orderSuccessView").style.display = "none";
+  document.getElementById("orderOverlay").classList.add("open");
+}
+document.getElementById("closeOrder").addEventListener("click", ()=> document.getElementById("orderOverlay").classList.remove("open"));
+
+document.getElementById("submitOrderBtn").addEventListener("click", async ()=>{
+  const p = products.find(x=>x.id===pendingOrderProductId);
+  if (!p) return;
+  const note = document.getElementById("oNote").value.trim();
+
+  const btn = document.getElementById("submitOrderBtn");
+  btn.disabled = true; btn.textContent = "Yuborilmoqda...";
+
+  const newOrder = {
+    id: "o" + Date.now(),
+    productId: p.id,
+    productName: p.name,
+    sellerName: p.seller,
+    sellerTg: p.tg,
+    buyerName: myName,
+    buyerTg: myTg,
+    note,
+    status: "new",
+    createdAt: Date.now()
+  };
+  orders.push(newOrder);
+  const ok = await saveKey("marketplace-orders", orders);
+  btn.disabled = false; btn.textContent = "🛒 Buyurtmani jo'natish";
+
+  if (ok){
+    haptic("medium");
+    document.getElementById("orderFormView").style.display = "none";
+    document.getElementById("orderSuccessView").style.display = "block";
+    renderAll();
+
+    // If seller has a telegram username, also open a prefilled chat as a reliable fallback.
+    if (p.tg){
+      const text = `🆕 Yangi buyurtma: ${p.name} (${fmt(p.price)})\nXaridor: ${myName}${myTg ? " (@"+myTg.replace(/^@/,"")+")" : ""}\nIzoh: ${note || "—"}`;
+      window.open("https://t.me/"+p.tg.replace(/^@/,"")+"?text="+encodeURIComponent(text), "_blank");
+    }
+    if (tg && typeof tg.sendData === "function"){
+      try{ tg.sendData(JSON.stringify({ type:"radmir_market_order", order:newOrder })); }catch(e){}
+    }
+  } else {
+    orders.pop();
+  }
+});
+document.getElementById("closeOrderSuccess").addEventListener("click", ()=> document.getElementById("orderOverlay").classList.remove("open"));
+
+async function markOrderDone(orderId){
+  const o = orders.find(x=>x.id===orderId);
+  if (!o) return;
+  o.status = "done";
+  const ok = await saveKey("marketplace-orders", orders);
+  if (ok){ showToast("Buyurtma yangilandi"); renderAll(); }
+}
+
+// ---------------- CHIPS ----------------
+document.getElementById("chipRow").addEventListener("click", (e)=>{
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  activeCat = chip.dataset.cat;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+  chip.classList.add("active");
+  renderShop();
+});
+
+// ---------------- PROFILE: NAME ----------------
+document.getElementById("saveNameBtn").addEventListener("click", ()=>{
+  const name = document.getElementById("fMyName").value.trim();
+  const tgu = document.getElementById("fMyTg").value.trim();
+  if (!name){ showToast("Ismingizni kiriting"); return; }
+  myName = name;
+  myTg = tgu;
+  renderAll();
+  showToast("Xush kelibsiz, " + name + "!");
+});
+document.getElementById("logoutBtn").addEventListener("click", ()=>{
+  myName = ""; myTg = ""; isAdmin = false;
+  document.getElementById("fMyName").value = "";
+  document.getElementById("fMyTg").value = "";
+  renderAll();
+});
+
+// ---------------- ADMIN ----------------
+document.getElementById("pinSubmit").addEventListener("click", ()=>{
+  const val = document.getElementById("fPin").value.trim();
+  if (val === ADMIN_PIN){
+    isAdmin = true;
+    document.getElementById("fPin").value = "";
+    showToast("Admin sifatida kirdingiz");
+    renderAll();
+  } else {
+    showToast("Kod noto'g'ri");
+  }
+});
+
+async function togglePin(id){
+  const p = products.find(x=>x.id===id);
+  if (!p) return;
+  p.pinned = !p.pinned;
+  const ok = await saveKey("marketplace-products", products);
+  if (ok) renderAll();
+}
+async function toggleBlockProduct(id){
+  const p = products.find(x=>x.id===id);
+  if (!p) return;
+  p.blocked = !p.blocked;
+  const ok = await saveKey("marketplace-products", products);
+  if (ok) renderAll();
+}
+async function toggleBlockSeller(name){
+  if (blockedSellers.includes(name)){
+    blockedSellers = blockedSellers.filter(n=>n!==name);
+  } else {
+    blockedSellers.push(name);
+  }
+  const ok = await saveKey("marketplace-blocked", blockedSellers);
+  if (ok){ showToast("Yangilandi"); renderAll(); }
+}
+
+init();
+</script>
+</body>
+</html>
