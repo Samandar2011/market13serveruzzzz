@@ -1,6 +1,6 @@
 // RADMIR MARKET — to'liq server
 // Bu bitta fayl 2 ta ishni qiladi:
-//  1) HTML sahifani (public/index.html) internetga chiqaradi
+//  1) HTML sahifani (index.html) internetga chiqaradi
 //  2) Mahsulotlar/buyurtmalar/bloklanganlar ro'yxatini data.json faylida doimiy saqlaydi
 //  3) Telegram botini ishga tushiradi (buyurtmalarni adminga forward qiladi)
 
@@ -17,7 +17,12 @@ const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || 7602467398; // /myid orqali o
 const PORT = process.env.PORT || 3000;
 // =========================
 
-const DATA_FILE = path.join(__dirname, "data.json");
+// Railway'da /data manziliga Volume ulangan bo'lsa, ma'lumot shu yerga yoziladi
+// va server qayta ishga tushsa ham (deploy, restart) YO'QOLMAYDI.
+// Agar Volume ulanmagan bo'lsa (masalan localhost'da test qilsangiz),
+// oddiy joriy papkaga yoziladi.
+const DATA_DIR = fs.existsSync("/data") ? "/data" : __dirname;
+const DATA_FILE = path.join(DATA_DIR, "data.json");
 
 const SEED_PRODUCTS = [
   { id:"fsb",  name:"FSB",         icon:"🛡️", price:700000, desc:"Davlat xavfsizlik tashkilotiga kirish xizmati.", cat:"xizmat", seller:"Radmir RP", tg:"uzbekovichh", pinned:true, blocked:false, createdAt:1 },
@@ -54,6 +59,9 @@ let db = loadData();
 // ---------- Express API ----------
 const app = express();
 app.use(express.json());
+
+// index.html va boshqa statik fayllar loyihaning ROOT papkasida joylashgan,
+// shuning uchun statik fayllarni __dirname (joriy papka) dan beramiz.
 app.use(express.static(__dirname));
 
 app.get("/api/products", (req, res) => res.json({ value: db.products }));
