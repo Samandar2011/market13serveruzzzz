@@ -521,11 +521,33 @@ function applyTelegramIdentity(){
 }
 
 // Telefon raqamini ulashishni so'raydi (Telegram'ning tabiiy oynasi orqali).
-// Bu shart emas — foydalanuvchi rad etsa ham, ism/username orqali kirish davom etadi.
+// Bu FAQAT BIR MARTA so'raladi — Telegram CloudStorage orqali "so'ralgan" belgisi
+// saqlanadi, shuning uchun ilovani qayta ochganda qayta-qayta so'ramaydi.
+// Foydalanuvchi rad etsa ham, ism/username orqali kirish davom etadi.
 function requestTelegramPhoneIfNeeded(){
   try{
-    if (tg && typeof tg.requestContact === "function"){
-      tg.requestContact(function(){ renderAll(); });
+    if (!(tg && typeof tg.requestContact === "function")) return;
+
+    const FLAG_KEY = "radmir_phone_requested";
+    const doRequest = () => {
+      tg.requestContact(function(){
+        renderAll();
+        try{
+          if (tg.CloudStorage && typeof tg.CloudStorage.setItem === "function"){
+            tg.CloudStorage.setItem(FLAG_KEY, "1");
+          }
+        }catch(e){}
+      });
+    };
+
+    if (tg.CloudStorage && typeof tg.CloudStorage.getItem === "function"){
+      tg.CloudStorage.getItem(FLAG_KEY, function(err, value){
+        if (!err && value === "1") return; // avval so'ralgan, qayta so'ramaymiz
+        doRequest();
+      });
+    } else {
+      // CloudStorage mavjud bo'lmasa (eski Telegram versiyasi), shunchaki so'raymiz
+      doRequest();
     }
   }catch(e){}
 }
