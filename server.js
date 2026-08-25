@@ -104,7 +104,7 @@ bot.onText(/\/myid/, (msg) => {
 bot.onText(/\/start/, (msg) => {
   // Bot o'zi joylashgan xosting manzilini WEBAPP_URL sifatida ishlatamiz.
   // Bu qiymatni environment variable orqali beriladi (masalan Railway domeni).
-  const webAppUrl = process.env.WEBAPP_URL || `http://localhost:${PORT}`;
+  const webAppUrl = process.env.WEBAPP_URL || `https://market13serveruzzzz-production.up.railway.app`;
   bot.sendMessage(msg.chat.id, "RADMIR MARKET botiga xush kelibsiz! Bozorni ochish uchun tugmani bosing 👇", {
     reply_markup: {
       inline_keyboard: [[
