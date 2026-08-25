@@ -54,7 +54,7 @@ let db = loadData();
 // ---------- Express API ----------
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(__dirname));
 
 app.get("/api/products", (req, res) => res.json({ value: db.products }));
 app.post("/api/products", (req, res) => {
@@ -104,7 +104,7 @@ bot.onText(/\/myid/, (msg) => {
 bot.onText(/\/start/, (msg) => {
   // Bot o'zi joylashgan xosting manzilini WEBAPP_URL sifatida ishlatamiz.
   // Bu qiymatni environment variable orqali beriladi (masalan Railway domeni).
-  const webAppUrl = process.env.WEBAPP_URL || `https://market13serveruzzzz-production.up.railway.app`;
+  const webAppUrl = process.env.WEBAPP_URL || `http://localhost:${PORT}`;
   bot.sendMessage(msg.chat.id, "RADMIR MARKET botiga xush kelibsiz! Bozorni ochish uchun tugmani bosing 👇", {
     reply_markup: {
       inline_keyboard: [[
