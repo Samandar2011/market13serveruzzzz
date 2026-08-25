@@ -51,6 +51,16 @@
   .section-label:first-child{ margin-top:0; }
   .section-label::after{ content:""; flex:1; height:1px; background:var(--line); }
 
+  /* Profil bo'limidagi yig'iladigan (collapsible) bloklar */
+  .collapse{ border:1px solid var(--line); border-radius:16px; margin:12px 0; overflow:hidden; background:var(--bg-1); }
+  .collapse > summary{ list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px; padding:14px 16px; font-size:13.5px; font-weight:700; color:var(--text-1); }
+  .collapse > summary::-webkit-details-marker{ display:none; }
+  .collapse > summary .arrow{ margin-left:auto; color:var(--text-2); font-size:12px; transition:transform .2s; }
+  .collapse[open] > summary .arrow{ transform:rotate(180deg); }
+  .collapse > summary .cnt-badge{ background:var(--bg-0); border:1px solid var(--line); color:var(--text-2); font-size:11px; padding:2px 9px; border-radius:999px; font-weight:700; }
+  .collapse-body{ padding:0 14px 14px; }
+  .collapse.admin-collapse{ border-color:rgba(224,64,60,.28); background:rgba(224,64,60,.06); }
+
   /* ---- STAT CARDS (menu) ---- */
   .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .stat-card{ background:var(--bg-1); border:1px solid var(--line); border-radius:14px; padding:14px; }
@@ -315,17 +325,23 @@
         <button class="logout-btn" id="logoutBtn">Chiqish</button>
       </div>
 
-      <p class="section-label">MENING MAHSULOTLARIM</p>
-      <div class="prod-list" id="myProductsList"></div>
+      <details class="collapse" id="secMyProducts">
+        <summary>📦 Mening mahsulotlarim <span class="cnt-badge" id="cntMyProducts">0</span><span class="arrow">⌄</span></summary>
+        <div class="collapse-body"><div class="prod-list" id="myProductsList"></div></div>
+      </details>
 
-      <p class="section-label">MENGA TUSHGAN BUYURTMALAR</p>
-      <div id="incomingOrdersList"></div>
+      <details class="collapse" id="secIncoming">
+        <summary>📥 Menga tushgan buyurtmalar <span class="cnt-badge" id="cntIncoming">0</span><span class="arrow">⌄</span></summary>
+        <div class="collapse-body"><div id="incomingOrdersList"></div></div>
+      </details>
 
-      <p class="section-label">MEN BERGAN BUYURTMALAR</p>
-      <div id="myOrdersList"></div>
+      <details class="collapse" id="secMyOrders">
+        <summary>🧾 Men bergan buyurtmalar <span class="cnt-badge" id="cntMyOrders">0</span><span class="arrow">⌄</span></summary>
+        <div class="collapse-body"><div id="myOrdersList"></div></div>
+      </details>
 
-      <p class="section-label">ADMINISTRATOR</p>
       <div class="admin-box" id="adminLoginBox">
+        <p class="section-label" style="margin-top:0;">ADMINISTRATOR</p>
         <div class="muted" style="color:var(--text-1); font-size:12.5px; margin-bottom:10px;">Admin kodi orqali foydalanuvchilarni bloklash va mahsulotlarni boshqarish mumkin.</div>
         <div class="pin-input-row">
           <input class="field-input" id="fPin" placeholder="Admin kodi" type="password" style="margin-top:0;">
@@ -334,14 +350,17 @@
       </div>
 
       <div id="adminPanel" style="display:none;">
-        <div class="admin-box">
-          <p class="section-label" style="margin-top:0;">FOYDALANUVCHILAR</p>
-          <div id="userAdminList"></div>
-        </div>
-        <div class="admin-box" style="margin-top:12px;">
-          <p class="section-label" style="margin-top:0;">BARCHA MAHSULOTLAR</p>
-          <div class="prod-list" id="adminProductsList"></div>
-        </div>
+        <p class="admin-pill" style="display:block; width:fit-content; margin-bottom:10px;">🛡️ ADMIN PANEL</p>
+
+        <details class="collapse admin-collapse" open>
+          <summary>👥 Foydalanuvchilar <span class="cnt-badge" id="usersCount">0</span><span class="arrow">⌄</span></summary>
+          <div class="collapse-body"><div id="userAdminList"></div></div>
+        </details>
+
+        <details class="collapse admin-collapse">
+          <summary>🗂️ Barcha mahsulotlar <span class="cnt-badge" id="cntAllProducts">0</span><span class="arrow">⌄</span></summary>
+          <div class="collapse-body"><div class="prod-list" id="adminProductsList"></div></div>
+        </details>
       </div>
     </div>
   </section>
@@ -440,6 +459,7 @@ const SEED_PRODUCTS = [
 let products = [];
 let orders = [];
 let blockedSellers = [];
+let allUsers = []; // ilovani ochgan barcha foydalanuvchilar ro'yxati (admin uchun)
 let myName = "";
 let myTg = "";
 let isAdmin = false;
@@ -456,6 +476,7 @@ function mapKeyToEndpoint(key){
   if (key === "marketplace-products") return "/api/products";
   if (key === "marketplace-orders") return "/api/orders";
   if (key === "marketplace-blocked") return "/api/blocked";
+  if (key === "marketplace-users") return "/api/users";
   return "/api/" + key;
 }
 async function loadKey(key, fallback){
@@ -552,6 +573,31 @@ function requestTelegramPhoneIfNeeded(){
   }catch(e){}
 }
 
+// Ilovani ochgan har bir foydalanuvchini "marketplace-users" ro'yxatiga yozadi,
+// shunda admin panelida FAQAT mahsulot qo'ygan emas, BARCHA foydalanuvchilar ko'rinadi.
+async function registerCurrentUser(){
+  if (!myName) return;
+  try{
+    const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+    const uid = tgUser && tgUser.id ? tgUser.id : null;
+
+    let existing = null;
+    if (uid !== null) existing = allUsers.find(u => u.id === uid);
+    if (!existing) existing = allUsers.find(u => u.name === myName);
+
+    if (existing){
+      const changed = existing.name !== myName || existing.tg !== myTg || (uid !== null && existing.id !== uid);
+      existing.name = myName;
+      existing.tg = myTg;
+      if (uid !== null) existing.id = uid;
+      if (!changed) return; // hech narsa o'zgarmagan, qayta saqlashning hojati yo'q
+    } else {
+      allUsers.push({ id: uid, name: myName, tg: myTg });
+    }
+    await saveKey("marketplace-users", allUsers);
+  }catch(e){}
+}
+
 // ---------------- INIT ----------------
 async function init(){
   products = await loadKey("marketplace-products", null);
@@ -561,12 +607,14 @@ async function init(){
   }
   orders = await loadKey("marketplace-orders", []);
   blockedSellers = await loadKey("marketplace-blocked", []);
+  allUsers = await loadKey("marketplace-users", []);
 
   // Telegram orqali ochilgan bo'lsa: ism/username avtomatik olinadi,
   // ADMIN_TELEGRAM_IDS ro'yxatidagilar uchun admin huquqi ham avtomatik beriladi,
   // va telefon raqamini ulashish so'raladi.
   applyTelegramIdentity();
   requestTelegramPhoneIfNeeded();
+  await registerCurrentUser();
 
   buildEmojiPicker();
   renderAll();
@@ -696,6 +744,7 @@ function renderProfile(){
   document.getElementById("profileTg").textContent = myTg ? ("@"+myTg.replace(/^@/,"")) : "Telegram kiritilmagan";
 
   const myProducts = products.filter(p=>p.seller === myName);
+  document.getElementById("cntMyProducts").textContent = myProducts.length;
   const myList = document.getElementById("myProductsList");
   myList.innerHTML = "";
   if (myProducts.length === 0){
@@ -705,6 +754,7 @@ function renderProfile(){
   }
 
   const incoming = orders.filter(o=>o.sellerName === myName).sort((a,b)=>b.createdAt-a.createdAt);
+  document.getElementById("cntIncoming").textContent = incoming.length;
   const inWrap = document.getElementById("incomingOrdersList");
   inWrap.innerHTML = "";
   if (incoming.length === 0){
@@ -714,6 +764,7 @@ function renderProfile(){
   }
 
   const mine = orders.filter(o=>o.buyerName === myName).sort((a,b)=>b.createdAt-a.createdAt);
+  document.getElementById("cntMyOrders").textContent = mine.length;
   const myOWrap = document.getElementById("myOrdersList");
   myOWrap.innerHTML = "";
   if (mine.length === 0){
@@ -768,17 +819,23 @@ function renderAdminPanel(){
     if (!sellerMap[p.seller]) sellerMap[p.seller] = 0;
     sellerMap[p.seller]++;
   });
+
   const userList = document.getElementById("userAdminList");
   userList.innerHTML = "";
-  const names = Object.keys(sellerMap).filter(n=>n !== "Radmir RP");
-  if (names.length === 0){
-    userList.innerHTML = `<div class="empty-state"><span class="ic">👥</span>Hali foydalanuvchi mahsulot qo'ymagan</div>`;
+  // Ilovani ochgan BARCHA foydalanuvchilar (faqat mahsulot qo'yganlar emas)
+  const usersToShow = allUsers.filter(u => u.name !== "Radmir RP");
+  document.getElementById("usersCount").textContent = usersToShow.length;
+
+  if (usersToShow.length === 0){
+    userList.innerHTML = `<div class="empty-state"><span class="ic">👥</span>Hali hech kim ilovani ochmagan</div>`;
   } else {
-    names.forEach(name=>{
+    usersToShow.forEach(u=>{
+      const name = u.name;
       const row = document.createElement("div");
       row.className = "user-row";
       const blocked = blockedSellers.includes(name);
-      row.innerHTML = `<div class="un">${escapeHtml(name)} <span class="cnt">(${sellerMap[name]} ta mahsulot)</span></div>`;
+      const prodCount = sellerMap[name] || 0;
+      row.innerHTML = `<div class="un">${escapeHtml(name)} ${u.tg ? `<span class="cnt">@${escapeHtml(u.tg.replace(/^@/,""))}</span>` : ""} <span class="cnt">· ${prodCount} ta mahsulot</span></div>`;
       const btn = document.createElement("button");
       btn.className = "mini-btn " + (blocked ? "buy" : "del");
       btn.textContent = blocked ? "Blokdan chiqarish" : "Bloklash";
@@ -788,6 +845,7 @@ function renderAdminPanel(){
     });
   }
 
+  document.getElementById("cntAllProducts").textContent = products.length;
   const adminProducts = document.getElementById("adminProductsList");
   adminProducts.innerHTML = "";
   products.slice().sort((a,b)=>b.createdAt-a.createdAt).forEach(p=>{

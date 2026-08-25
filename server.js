@@ -37,15 +37,17 @@ const SEED_PRODUCTS = [
 // ---------- oddiy fayl-baza ----------
 function loadData(){
   if (!fs.existsSync(DATA_FILE)){
-    const initial = { products: SEED_PRODUCTS, orders: [], blocked: [] };
+    const initial = { products: SEED_PRODUCTS, orders: [], blocked: [], users: [] };
     fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2));
     return initial;
   }
   try{
-    return JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
+    const data = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
+    if (!data.users) data.users = []; // eski data.json fayllarida "users" bo'lmasligi mumkin
+    return data;
   }catch(e){
     console.error("data.json o'qishda xatolik, qaytadan yaratildi", e);
-    const initial = { products: SEED_PRODUCTS, orders: [], blocked: [] };
+    const initial = { products: SEED_PRODUCTS, orders: [], blocked: [], users: [] };
     fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2));
     return initial;
   }
@@ -96,6 +98,13 @@ Izoh: ${newOrder.note || "-"}`;
 app.get("/api/blocked", (req, res) => res.json({ value: db.blocked }));
 app.post("/api/blocked", (req, res) => {
   db.blocked = req.body.value || [];
+  saveData(db);
+  res.json({ ok: true });
+});
+
+app.get("/api/users", (req, res) => res.json({ value: db.users }));
+app.post("/api/users", (req, res) => {
+  db.users = req.body.value || [];
   saveData(db);
   res.json({ ok: true });
 });
