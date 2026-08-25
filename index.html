@@ -504,6 +504,32 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove("show"), 2400);
 }
 
+// ---------------- TELEGRAM LOGIN ----------------
+// Telegram Mini App ichida ochilganda foydalanuvchining ismi va username'i
+// hech qanday so'rovsiz, avtomatik ravishda mavjud bo'ladi (tg.initDataUnsafe.user).
+// Shu tufayli qo'lda "Ism/username kiriting" formasi kerak bo'lmaydi.
+function applyTelegramIdentity(){
+  try{
+    const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+    if (!tgUser) return false;
+    const fullName = [tgUser.first_name, tgUser.last_name].filter(Boolean).join(" ").trim();
+    if (fullName) myName = fullName;
+    if (tgUser.username) myTg = tgUser.username;
+    if (ADMIN_TELEGRAM_IDS.includes(tgUser.id)) isAdmin = true;
+    return true;
+  }catch(e){ return false; }
+}
+
+// Telefon raqamini ulashishni so'raydi (Telegram'ning tabiiy oynasi orqali).
+// Bu shart emas — foydalanuvchi rad etsa ham, ism/username orqali kirish davom etadi.
+function requestTelegramPhoneIfNeeded(){
+  try{
+    if (tg && typeof tg.requestContact === "function"){
+      tg.requestContact(function(){ renderAll(); });
+    }
+  }catch(e){}
+}
+
 // ---------------- INIT ----------------
 async function init(){
   products = await loadKey("marketplace-products", null);
@@ -514,14 +540,11 @@ async function init(){
   orders = await loadKey("marketplace-orders", []);
   blockedSellers = await loadKey("marketplace-blocked", []);
 
-  // Telegram orqali ochilgan bo'lsa va foydalanuvchi ID'si ADMIN_TELEGRAM_IDS
-  // ro'yxatida bo'lsa, PIN kiritmasdan avtomatik admin bo'ladi.
-  try{
-    const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
-    if (tgUser && ADMIN_TELEGRAM_IDS.includes(tgUser.id)){
-      isAdmin = true;
-    }
-  }catch(e){}
+  // Telegram orqali ochilgan bo'lsa: ism/username avtomatik olinadi,
+  // ADMIN_TELEGRAM_IDS ro'yxatidagilar uchun admin huquqi ham avtomatik beriladi,
+  // va telefon raqamini ulashish so'raladi.
+  applyTelegramIdentity();
+  requestTelegramPhoneIfNeeded();
 
   buildEmojiPicker();
   renderAll();
