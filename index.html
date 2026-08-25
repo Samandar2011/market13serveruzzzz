@@ -419,7 +419,10 @@ const tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { try { tg.ready(); tg.expand(); } catch(e){} }
 
 // ---------------- CONFIG ----------------
-const ADMIN_PIN = "20110117";              // <-- shu kodni faqat o'zingiz biling, adminlikka kirish uchun shu ishlatiladi
+const ADMIN_PIN = "7799";              // <-- shu kodni faqat o'zingiz biling, adminlikka kirish uchun shu ishlatiladi
+// Shu ro'yxatdagi Telegram ID'lar botni ochganda AVTOMATIK admin bo'ladi (PIN kerak emas).
+// /myid buyrug'i orqali o'z ID'ingizni oling va shu yerga yozing (bir nechta bo'lsa vergul bilan ajrating).
+const ADMIN_TELEGRAM_IDS = [7602467398];
 const ACCENTS = ["var(--red)","var(--blue)","var(--orange)","var(--green)","var(--purple)","var(--gold)"];
 const EMOJIS = ["🛡️","🚔","📡","⚕️","🔑","🏛️","⭐","🚗","🏠","📱","💎","🛠️","🎮","👕","🍔","📦"];
 
@@ -510,6 +513,15 @@ async function init(){
   }
   orders = await loadKey("marketplace-orders", []);
   blockedSellers = await loadKey("marketplace-blocked", []);
+
+  // Telegram orqali ochilgan bo'lsa va foydalanuvchi ID'si ADMIN_TELEGRAM_IDS
+  // ro'yxatida bo'lsa, PIN kiritmasdan avtomatik admin bo'ladi.
+  try{
+    const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+    if (tgUser && ADMIN_TELEGRAM_IDS.includes(tgUser.id)){
+      isAdmin = true;
+    }
+  }catch(e){}
 
   buildEmojiPicker();
   renderAll();
