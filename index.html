@@ -160,18 +160,49 @@
   .prod-tile::before{ content:""; position:absolute; left:0; right:0; top:0; height:4px; background:var(--accent, var(--gold)); }
   .prod-tile.blocked{ opacity:.5; }
   .prod-tile .tile-tags{ position:absolute; top:10px; right:10px; display:flex; flex-direction:column; gap:4px; align-items:flex-end; }
+  .prod-tile .tile-media{ cursor:pointer; }
   .prod-tile .prod-tile-icon{
-    width:100%; height:56px; border-radius:12px; font-size:26px; margin-bottom:8px;
+    width:100%; height:112px; border-radius:12px; font-size:38px; margin-bottom:7px;
     display:flex; align-items:center; justify-content:center;
     background:color-mix(in srgb, var(--accent) 18%, var(--bg-0));
     border:1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
   }
-  .prod-tile .prod-tile-img{ width:100%; height:96px; object-fit:cover; border-radius:12px; margin-bottom:8px; display:block; }
-  .prod-tile .prod-tile-name{ font-size:13.5px; font-weight:800; line-height:1.25; min-height:2.5em; }
-  .prod-tile .prod-tile-desc{ font-size:11px; color:var(--text-2); margin-top:4px; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .prod-tile .prod-tile-seller{ font-size:10.5px; color:var(--text-2); margin-top:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .prod-tile .prod-tile-price{ font-size:14px; font-weight:900; color:var(--accent, var(--gold)); margin-top:6px; }
-  .prod-tile .mini-btn{ width:100%; margin-top:9px; }
+  .prod-tile .prod-tile-img{ width:100%; height:140px; object-fit:cover; border-radius:12px; margin-bottom:7px; display:block; }
+  .prod-tile .prod-tile-name{ font-size:12px; font-weight:800; line-height:1.2; min-height:2.1em; cursor:pointer; }
+  .prod-tile .prod-tile-desc{ font-size:10px; color:var(--text-2); margin-top:3px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+  .prod-tile .prod-tile-seller{ font-size:9.5px; color:var(--text-2); margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .prod-tile .prod-tile-price{ font-size:13.5px; font-weight:900; color:var(--accent, var(--gold)); margin-top:5px; }
+  .prod-tile .mini-btn{ width:100%; margin-top:8px; }
+
+  /* ---- PRODUCT DETAIL MODAL ---- */
+  .detail-media{
+    width:100%; height:230px; border-radius:16px; overflow:hidden; position:relative;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--bg-0); border:1px solid var(--line);
+  }
+  .detail-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .detail-media .icon-big{ font-size:70px; }
+  .detail-media .zoom-hint{
+    position:absolute; bottom:9px; right:9px; background:rgba(0,0,0,.6); color:#fff; font-size:11px;
+    padding:5px 10px; border-radius:20px; display:flex; align-items:center; gap:5px; pointer-events:none;
+  }
+  #detailName{ margin:12px 0 2px; }
+  #detailPrice{ font-size:19px; }
+  #detailSeller{ margin-top:6px; font-size:12.5px; color:var(--text-2); }
+  #detailDesc{ margin-top:12px; color:var(--text-1); font-size:13.5px; line-height:1.55; }
+
+  /* ---- FULLSCREEN IMAGE LIGHTBOX ---- */
+  .lightbox{
+    position:fixed; inset:0; background:rgba(2,3,6,.94); z-index:120; display:flex;
+    align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+  .lightbox.open{ opacity:1; pointer-events:auto; }
+  .lightbox img{ max-width:92vw; max-height:85vh; border-radius:10px; object-fit:contain; }
+  .lightbox-close{
+    position:absolute; top:18px; right:18px; width:38px; height:38px; border-radius:50%;
+    background:rgba(255,255,255,.14); color:#fff; display:flex; align-items:center; justify-content:center;
+    font-size:18px; cursor:pointer;
+  }
 
   /* ---- SOZLAMALAR: TIL TUGMALARI ---- */
   .lang-row{ display:flex; flex-direction:column; gap:8px; }
@@ -526,6 +557,27 @@
   </div>
 </div>
 
+<!-- PRODUCT DETAIL MODAL -->
+<div class="overlay" id="detailOverlay">
+  <div class="sheet">
+    <div class="close-x" id="closeDetail">✕</div>
+    <div class="sheet-handle"></div>
+    <div class="detail-media" id="detailMedia"></div>
+    <div class="tile-tags" id="detailTags" style="position:static; flex-direction:row; margin-top:10px; gap:6px;"></div>
+    <h2 class="heavy" id="detailName">—</h2>
+    <div class="prod-tile-price" id="detailPrice"></div>
+    <div id="detailSeller"></div>
+    <p id="detailDesc"></p>
+    <button class="submit-btn" id="detailOrderBtn">🛒 <span data-i18n="order_btn">Buyurtma berish</span></button>
+  </div>
+</div>
+
+<!-- FULLSCREEN IMAGE LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-close" id="lightboxClose">✕</div>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -596,6 +648,7 @@ const I18N = {
     toast_blocked_seller:"Siz administrator tomonidan bloklangansiz, mahsulot qo'sha olmaysiz",
     toast_need_name_first:"Avval Profil bo'limida ismingizni kiriting",
     toast_enter_pname:"Mahsulot nomini kiriting", toast_enter_price:"To'g'ri narx kiriting", loading:"Bozor yuklanmoqda...",
+    tap_to_zoom:"Kattalashtirish",
   },
   ru:{
     nav_menu:"Меню", nav_shop:"Магазин", nav_profile:"Профиль", nav_settings:"Настройки",
@@ -628,6 +681,7 @@ const I18N = {
     toast_blocked_seller:"Вы заблокированы администратором и не можете добавлять товары",
     toast_need_name_first:"Сначала укажите имя в профиле",
     toast_enter_pname:"Введите название товара", toast_enter_price:"Введите корректную цену", loading:"Загрузка магазина...",
+    tap_to_zoom:"Увеличить",
   },
   en:{
     nav_menu:"Menu", nav_shop:"Shop", nav_profile:"Profile", nav_settings:"Settings",
@@ -660,6 +714,7 @@ const I18N = {
     toast_blocked_seller:"You've been blocked by an admin and can't add listings",
     toast_need_name_first:"Please enter your name in Profile first",
     toast_enter_pname:"Please enter a listing name", toast_enter_price:"Please enter a valid price", loading:"Loading marketplace...",
+    tap_to_zoom:"Zoom in",
   },
 };
 function t(key){
@@ -987,19 +1042,73 @@ function buildProductTile(p){
 
   tile.innerHTML = `
     <div class="tile-tags">${tags.join("")}</div>
-    ${mediaHtml}
+    <div class="tile-media">${mediaHtml}</div>
     <div class="prod-tile-name">${escapeHtml(p.name)}</div>
     <div class="prod-tile-desc">${escapeHtml(p.desc||"")}</div>
     <div class="prod-tile-seller">${t("seller")}: ${escapeHtml(p.seller)}</div>
     <div class="prod-tile-price">${fmt(p.price)}</div>
   `;
+  // Rasm yoki nomga bosilganda to'liq tafsilot oynasi ochiladi
+  tile.querySelector(".tile-media").addEventListener("click", ()=> openProductDetail(p.id));
+  tile.querySelector(".prod-tile-name").addEventListener("click", ()=> openProductDetail(p.id));
+
   const buyBtn = document.createElement("button");
   buyBtn.className = "mini-btn buy";
   buyBtn.textContent = t("order_btn");
-  buyBtn.addEventListener("click", ()=> openOrderModal(p.id));
+  buyBtn.addEventListener("click", (e)=>{ e.stopPropagation(); openOrderModal(p.id); });
   tile.appendChild(buyBtn);
   return tile;
 }
+
+// ---------------- PRODUCT DETAIL MODAL ----------------
+let pendingDetailProductId = null;
+
+function openProductDetail(id){
+  const p = products.find(x=>x.id===id);
+  if (!p) return;
+  pendingDetailProductId = id;
+
+  const mediaWrap = document.getElementById("detailMedia");
+  if (p.image){
+    mediaWrap.innerHTML = `<img src="${p.image}" alt=""><div class="zoom-hint">🔍 ${t("tap_to_zoom")}</div>`;
+    mediaWrap.style.cursor = "zoom-in";
+    mediaWrap.onclick = ()=> openLightbox(p.image);
+  } else {
+    mediaWrap.innerHTML = `<div class="icon-big">${p.icon}</div>`;
+    mediaWrap.style.cursor = "default";
+    mediaWrap.onclick = null;
+  }
+
+  const tags = [];
+  if (p.pinned) tags.push(`<span class="tag pin">${t("official_tag")}</span>`);
+  if (p.blocked) tags.push(`<span class="tag blk">${t("blocked_tag")}</span>`);
+  document.getElementById("detailTags").innerHTML = tags.join("");
+
+  document.getElementById("detailName").textContent = p.name;
+  document.getElementById("detailPrice").textContent = fmt(p.price);
+  document.getElementById("detailSeller").textContent = t("seller") + ": " + p.seller;
+  document.getElementById("detailDesc").textContent = p.desc || "";
+
+  document.getElementById("detailOverlay").classList.add("open");
+}
+document.getElementById("closeDetail").addEventListener("click", ()=>{
+  document.getElementById("detailOverlay").classList.remove("open");
+});
+document.getElementById("detailOrderBtn").addEventListener("click", ()=>{
+  document.getElementById("detailOverlay").classList.remove("open");
+  openOrderModal(pendingDetailProductId);
+});
+
+function openLightbox(src){
+  document.getElementById("lightboxImg").src = src;
+  document.getElementById("lightbox").classList.add("open");
+}
+document.getElementById("lightboxClose").addEventListener("click", ()=>{
+  document.getElementById("lightbox").classList.remove("open");
+});
+document.getElementById("lightbox").addEventListener("click", (e)=>{
+  if (e.target.id === "lightbox") document.getElementById("lightbox").classList.remove("open");
+});
 
 // ---------------- SETTINGS ----------------
 function renderSettings(){
