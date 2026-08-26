@@ -12,9 +12,14 @@ const TelegramBot = require("node-telegram-bot-api");
 // ====== SOZLAMALAR ======
 // Bularni to'g'ridan-to'g'ri shu yerga yozishingiz ham mumkin,
 // lekin Railway/Render'da "Environment Variables" orqali berish xavfsizroq.
-const BOT_TOKEN = process.env.BOT_TOKEN || "8731416629:AAG6J_4ryTEhy6yc_dTo28LoPLxSE2-vTG8";
-const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || 7602467398; // /myid orqali olib, shu yerga yozasiz
+const BOT_TOKEN = process.env.BOT_TOKEN;       // Railway'ning Variables bo'limida beriladi, kodga yozilmaydi
+const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || 7602467398; // bu maxfiy emas, shuning uchun fallback qoldirsa bo'ladi
 const PORT = process.env.PORT || 3000;
+
+if (!BOT_TOKEN) {
+  console.error("XATO: BOT_TOKEN topilmadi! Railway'ning Variables bo'limiga BOT_TOKEN qo'shing.");
+  process.exit(1);
+}
 // =========================
 
 // Railway'da /data manziliga Volume ulangan bo'lsa, ma'lumot shu yerga yoziladi
@@ -37,17 +42,18 @@ const SEED_PRODUCTS = [
 // ---------- oddiy fayl-baza ----------
 function loadData(){
   if (!fs.existsSync(DATA_FILE)){
-    const initial = { products: SEED_PRODUCTS, orders: [], blocked: [], users: [] };
+    const initial = { products: SEED_PRODUCTS, orders: [], blocked: [], users: [], admins: {} };
     fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2));
     return initial;
   }
   try{
     const data = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
     if (!data.users) data.users = []; // eski data.json fayllarida "users" bo'lmasligi mumkin
+    if (!data.admins) data.admins = {}; // eski data.json fayllarida "admins" bo'lmasligi mumkin
     return data;
   }catch(e){
     console.error("data.json o'qishda xatolik, qaytadan yaratildi", e);
-    const initial = { products: SEED_PRODUCTS, orders: [], blocked: [], users: [] };
+    const initial = { products: SEED_PRODUCTS, orders: [], blocked: [], users: [], admins: {} };
     fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2));
     return initial;
   }
@@ -105,6 +111,13 @@ app.post("/api/blocked", (req, res) => {
 app.get("/api/users", (req, res) => res.json({ value: db.users }));
 app.post("/api/users", (req, res) => {
   db.users = req.body.value || [];
+  saveData(db);
+  res.json({ ok: true });
+});
+
+app.get("/api/admins", (req, res) => res.json({ value: db.admins }));
+app.post("/api/admins", (req, res) => {
+  db.admins = req.body.value || {};
   saveData(db);
   res.json({ ok: true });
 });
