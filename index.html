@@ -261,12 +261,22 @@
   .admin-box{ background:rgba(224,64,60,.06); border:1px solid rgba(224,64,60,.28); border-radius:16px; padding:14px; }
   .pin-input-row{ display:flex; gap:8px; }
   .pin-input-row input{ flex:1; }
+  .user-row-wrap{ border-bottom:1px dashed var(--line); }
+  .user-row-wrap:last-child{ border-bottom:none; }
   .user-row{
-    display:flex; align-items:center; justify-content:between; gap:10px; padding:10px 0;
-    border-bottom:1px dashed var(--line);
+    display:flex; align-items:center; justify-content:between; gap:10px; padding:10px 0; flex-wrap:wrap;
   }
-  .user-row .un{ flex:1; font-size:13.5px; font-weight:700; }
-  .user-row .cnt{ font-size:11px; color:var(--text-2); }
+  .user-row .un{ flex:1; min-width:120px; font-size:13.5px; font-weight:700; }
+  .user-row .cnt{ font-size:11px; color:var(--text-2); font-weight:400; }
+  .user-row-actions{ display:flex; align-items:center; gap:6px; flex-shrink:0; margin-left:auto; }
+  .admin-badge{
+    font-size:11px; font-weight:800; padding:5px 10px; border-radius:20px; white-space:nowrap;
+    background:rgba(244,185,62,.16); border:1px solid var(--gold); color:var(--gold-2);
+  }
+  .assign-panel{ padding:2px 0 14px; }
+  .assign-panel .perm-row{ margin-top:0; }
+  .assign-panel .assign-actions{ display:flex; gap:8px; margin-top:10px; }
+  .assign-panel .assign-actions .mini-btn{ flex:none; }
 
   input.field-input, textarea.field-input, select.field-input{
     width:100%; margin-top:6px; padding:12px; border-radius:11px;
@@ -460,7 +470,10 @@
 
         <details class="collapse admin-collapse" open>
           <summary>👥 <span data-i18n="users">Foydalanuvchilar</span> <span class="cnt-badge" id="usersCount">0</span><span class="arrow">⌄</span></summary>
-          <div class="collapse-body"><div id="userAdminList"></div></div>
+          <div class="collapse-body">
+            <input class="field-input" id="userSearchInput" style="margin-top:0; margin-bottom:8px;" placeholder="Ism yoki username orqali qidirish..." data-i18n-ph="user_search_ph">
+            <div id="userAdminList"></div>
+          </div>
         </details>
 
         <details class="collapse admin-collapse">
@@ -472,18 +485,6 @@
           <summary>🛡️ <span data-i18n="admin_manage_title">Adminlarni boshqarish</span> <span class="cnt-badge" id="adminsCount">0</span><span class="arrow">⌄</span></summary>
           <div class="collapse-body">
             <div id="adminsList"></div>
-            <div style="margin-top:14px; padding-top:14px; border-top:1px dashed var(--line);">
-              <label class="field" style="margin-top:0;" data-i18n="admin_add_name_lbl">Foydalanuvchi ismi (profilida ko'rsatilgani bilan bir xil bo'lishi kerak)</label>
-              <input class="field-input" id="newAdminName" placeholder="Masalan: Sardor_99">
-              <div class="perm-row" id="newAdminPerms">
-                <div class="perm-chip" data-perm="pin" data-i18n="perm_pin">Mahkamlash</div>
-                <div class="perm-chip" data-perm="unpin" data-i18n="perm_unpin">Yechish</div>
-                <div class="perm-chip" data-perm="blockProduct" data-i18n="perm_blockproduct">Mahsulot bloklash</div>
-                <div class="perm-chip" data-perm="deleteProduct" data-i18n="perm_deleteproduct">Mahsulot o'chirish</div>
-                <div class="perm-chip" data-perm="blockUser" data-i18n="perm_blockuser">Foydalanuvchi bloklash</div>
-              </div>
-              <button class="submit-btn" id="assignAdminBtn" data-i18n="admin_assign_btn">Admin qilib tayinlash</button>
-            </div>
           </div>
         </details>
       </div>
@@ -680,11 +681,13 @@ const I18N = {
     toast_need_name_first:"Avval Profil bo'limida ismingizni kiriting",
     toast_enter_pname:"Mahsulot nomini kiriting", toast_enter_price:"To'g'ri narx kiriting", loading:"Bozor yuklanmoqda...",
     tap_to_zoom:"Kattalashtirish",
-    admin_manage_title:"Adminlarni boshqarish", admin_add_name_lbl:"Foydalanuvchi ismi (profilida ko'rsatilgani bilan bir xil bo'lishi kerak)",
+    admin_manage_title:"Adminlarni boshqarish",
     admin_assign_btn:"Admin qilib tayinlash", admin_remove_btn:"Olib tashlash", admin_none:"Hali hech kimga admin huquqi berilmagan",
     perm_pin:"Mahkamlash", perm_unpin:"Yechish", perm_blockproduct:"Mahsulot bloklash", perm_deleteproduct:"Mahsulot o'chirish", perm_blockuser:"Foydalanuvchi bloklash",
     toast_admin_added:"Admin tayinlandi", toast_admin_removed:"Admin huquqi olib tashlandi", toast_pick_perm:"Kamida bitta huquq tanlang",
     toast_secret_admin:"Admin kirish oynasi ochildi",
+    user_search_ph:"Ism yoki username orqali qidirish...", empty_user_search:"Hech narsa topilmadi",
+    cancel:"Bekor qilish", confirm_assign:"Tayinlash", administrator_short:"Admin",
   },
   ru:{
     nav_menu:"Меню", nav_shop:"Магазин", nav_profile:"Профиль", nav_settings:"Настройки",
@@ -718,11 +721,13 @@ const I18N = {
     toast_need_name_first:"Сначала укажите имя в профиле",
     toast_enter_pname:"Введите название товара", toast_enter_price:"Введите корректную цену", loading:"Загрузка магазина...",
     tap_to_zoom:"Увеличить",
-    admin_manage_title:"Управление админами", admin_add_name_lbl:"Имя пользователя (должно совпадать с профилем)",
+    admin_manage_title:"Управление админами",
     admin_assign_btn:"Назначить админом", admin_remove_btn:"Убрать", admin_none:"Пока никому не выданы права админа",
     perm_pin:"Закрепление", perm_unpin:"Открепление", perm_blockproduct:"Блокировка товара", perm_deleteproduct:"Удаление товара", perm_blockuser:"Блокировка пользователя",
     toast_admin_added:"Админ назначен", toast_admin_removed:"Права админа убраны", toast_pick_perm:"Выберите хотя бы одно право",
     toast_secret_admin:"Окно входа админа открыто",
+    user_search_ph:"Поиск по имени или username...", empty_user_search:"Ничего не найдено",
+    cancel:"Отмена", confirm_assign:"Назначить", administrator_short:"Админ",
   },
   en:{
     nav_menu:"Menu", nav_shop:"Shop", nav_profile:"Profile", nav_settings:"Settings",
@@ -756,11 +761,13 @@ const I18N = {
     toast_need_name_first:"Please enter your name in Profile first",
     toast_enter_pname:"Please enter a listing name", toast_enter_price:"Please enter a valid price", loading:"Loading marketplace...",
     tap_to_zoom:"Zoom in",
-    admin_manage_title:"Manage admins", admin_add_name_lbl:"Username (must match their profile name)",
+    admin_manage_title:"Manage admins",
     admin_assign_btn:"Assign as admin", admin_remove_btn:"Remove", admin_none:"No one has been granted admin rights yet",
     perm_pin:"Pin", perm_unpin:"Unpin", perm_blockproduct:"Block listing", perm_deleteproduct:"Delete listing", perm_blockuser:"Block user",
     toast_admin_added:"Admin assigned", toast_admin_removed:"Admin rights removed", toast_pick_perm:"Select at least one permission",
     toast_secret_admin:"Admin login opened",
+    user_search_ph:"Search by name or username...", empty_user_search:"Nothing found",
+    cancel:"Cancel", confirm_assign:"Assign", administrator_short:"Admin",
   },
 };
 function t(key){
@@ -805,6 +812,8 @@ let orders = [];
 let blockedSellers = [];
 let allUsers = []; // ilovani ochgan barcha foydalanuvchilar ro'yxati (admin uchun)
 let adminsMap = {}; // {ism: {pin, unpin, blockProduct, deleteProduct, blockUser}} — bosh admin tayinlagan adminlar
+let userSearchQuery = ""; // Foydalanuvchilar bo'limidagi qidiruv matni
+let assigningAdminFor = null; // hozir qaysi foydalanuvchi uchun "admin qilib tayinlash" paneli ochiq
 let myName = "";
 let myTg = "";
 let isAdmin = false;       // hozirgi foydalanuvchi HAR QANDAY admin huquqiga egami (bosh admin yoki cheklangan admin)
@@ -1357,27 +1366,118 @@ function renderAdminPanel(){
   const userList = document.getElementById("userAdminList");
   userList.innerHTML = "";
   // Ilovani ochgan BARCHA foydalanuvchilar (faqat mahsulot qo'yganlar emas)
-  const usersToShow = allUsers.filter(u => u.name !== "Radmir RP");
+  let usersToShow = allUsers.filter(u => u.name !== "Radmir RP");
   document.getElementById("usersCount").textContent = usersToShow.length;
 
+  // Qidiruv (ism yoki username orqali)
+  const q = (userSearchQuery || "").trim().toLowerCase();
+  if (q){
+    usersToShow = usersToShow.filter(u=>{
+      const name = (u.name || "").toLowerCase();
+      const tg = (u.tg || "").toLowerCase();
+      return name.includes(q) || tg.includes(q);
+    });
+  }
+
   if (usersToShow.length === 0){
-    userList.innerHTML = `<div class="empty-state"><span class="ic">👥</span>${t("empty_users")}</div>`;
+    userList.innerHTML = `<div class="empty-state"><span class="ic">👥</span>${q ? t("empty_user_search") : t("empty_users")}</div>`;
   } else {
     usersToShow.forEach(u=>{
       const name = u.name;
+      const wrap = document.createElement("div");
+      wrap.className = "user-row-wrap";
+
       const row = document.createElement("div");
       row.className = "user-row";
       const blocked = blockedSellers.includes(name);
+      const isThisUserAdmin = !!adminsMap[name];
       const prodCount = sellerMap[name] || 0;
       row.innerHTML = `<div class="un">${escapeHtml(name)} ${u.tg ? `<span class="cnt">@${escapeHtml(u.tg.replace(/^@/,""))}</span>` : ""} <span class="cnt">· ${prodCount} ta mahsulot</span></div>`;
+
+      const actions = document.createElement("div");
+      actions.className = "user-row-actions";
+
+      // Adminlikka tayinlash — faqat bosh admin uchun, blok tugmasidan OLDIN
+      if (isSuperAdmin){
+        if (isThisUserAdmin){
+          const badge = document.createElement("span");
+          badge.className = "admin-badge";
+          badge.textContent = "🛡️ " + t("administrator_short");
+          actions.appendChild(badge);
+        } else {
+          const assignBtn = document.createElement("button");
+          assignBtn.className = "mini-btn pin";
+          assignBtn.textContent = "🛡️ " + t("admin_assign_btn");
+          assignBtn.addEventListener("click", ()=>{
+            assigningAdminFor = (assigningAdminFor === name) ? null : name;
+            renderAdminPanel();
+          });
+          actions.appendChild(assignBtn);
+        }
+      }
+
       if (myPerms().blockUser){
         const btn = document.createElement("button");
         btn.className = "mini-btn " + (blocked ? "buy" : "del");
         btn.textContent = blocked ? t("unblock") : t("block");
         btn.addEventListener("click", ()=> toggleBlockSeller(name));
-        row.appendChild(btn);
+        actions.appendChild(btn);
       }
-      userList.appendChild(row);
+
+      row.appendChild(actions);
+      wrap.appendChild(row);
+
+      // Ushbu foydalanuvchi uchun huquq tanlash paneli (ochilgan bo'lsa)
+      if (isSuperAdmin && assigningAdminFor === name){
+        const panel = document.createElement("div");
+        panel.className = "assign-panel";
+
+        const chipRow = document.createElement("div");
+        chipRow.className = "perm-row";
+        chipRow.id = "assignPerms-" + name;
+        PERM_KEYS.forEach(key=>{
+          const chip = document.createElement("div");
+          chip.className = "perm-chip";
+          chip.dataset.perm = key;
+          chip.textContent = t(PERM_LABELS[key]);
+          chip.addEventListener("click", ()=> chip.classList.toggle("on"));
+          chipRow.appendChild(chip);
+        });
+        panel.appendChild(chipRow);
+
+        const actionsRow = document.createElement("div");
+        actionsRow.className = "assign-actions";
+
+        const confirmBtn = document.createElement("button");
+        confirmBtn.className = "mini-btn buy";
+        confirmBtn.textContent = t("confirm_assign");
+        confirmBtn.addEventListener("click", async ()=>{
+          const perms = {};
+          chipRow.querySelectorAll(".perm-chip").forEach(chip=>{
+            perms[chip.dataset.perm] = chip.classList.contains("on");
+          });
+          if (!Object.values(perms).some(Boolean)){ showToast(t("toast_pick_perm")); return; }
+          adminsMap[name] = perms;
+          const ok = await saveKey("marketplace-admins", adminsMap);
+          if (ok){
+            assigningAdminFor = null;
+            showToast(t("toast_admin_added"));
+            renderAll();
+          }
+        });
+        actionsRow.appendChild(confirmBtn);
+
+        const cancelBtn = document.createElement("button");
+        cancelBtn.className = "mini-btn blk";
+        cancelBtn.textContent = t("cancel");
+        cancelBtn.addEventListener("click", ()=>{ assigningAdminFor = null; renderAdminPanel(); });
+        actionsRow.appendChild(cancelBtn);
+
+        panel.appendChild(actionsRow);
+        wrap.appendChild(panel);
+      }
+
+      userList.appendChild(wrap);
     });
   }
 
@@ -1435,11 +1535,6 @@ function renderAdminsManage(){
       wrap.appendChild(row);
     });
   }
-
-  // yangi admin qo'shish formasidagi belgilar (chip) bosilganda yoqilib/o'chib turishi
-  document.querySelectorAll("#newAdminPerms .perm-chip").forEach(chip=>{
-    chip.onclick = ()=> chip.classList.toggle("on");
-  });
 }
 
 async function toggleAdminPerm(name, key){
@@ -1455,24 +1550,10 @@ async function removeAdmin(name){
   if (ok){ showToast(t("toast_admin_removed")); renderAll(); }
 }
 
-document.getElementById("assignAdminBtn").addEventListener("click", async ()=>{
-  const name = document.getElementById("newAdminName").value.trim();
-  if (!name){ showToast(t("toast_enter_name")); return; }
-
-  const perms = {};
-  document.querySelectorAll("#newAdminPerms .perm-chip").forEach(chip=>{
-    perms[chip.dataset.perm] = chip.classList.contains("on");
-  });
-  if (!Object.values(perms).some(Boolean)){ showToast(t("toast_pick_perm")); return; }
-
-  adminsMap[name] = perms;
-  const ok = await saveKey("marketplace-admins", adminsMap);
-  if (ok){
-    document.getElementById("newAdminName").value = "";
-    document.querySelectorAll("#newAdminPerms .perm-chip").forEach(chip=>chip.classList.remove("on"));
-    showToast(t("toast_admin_added"));
-    renderAll();
-  }
+// Foydalanuvchilar bo'limidagi qidiruv (ism yoki username orqali)
+document.getElementById("userSearchInput").addEventListener("input", (e)=>{
+  userSearchQuery = e.target.value;
+  renderAdminPanel();
 });
 
 // ---------------- MAXFIY ISHORA: admin kirish oynasini ochish ----------------
