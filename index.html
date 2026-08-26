@@ -88,15 +88,34 @@
   .pin-card .nm{ font-size:13px; font-weight:700; margin-top:6px; }
   .pin-card .pr{ font-size:12px; font-weight:800; color:var(--accent, var(--gold)); margin-top:2px; }
 
-  /* ---- FILTER CHIPS ---- */
+  /* ---- FILTER CHIPS (eski, endi ishlatilmaydi, orqaga moslik uchun qoldirilgan) ---- */
   .chip-row{ display:flex; gap:8px; margin-bottom:12px; overflow-x:auto; }
+  .chip-row::-webkit-scrollbar{ display:none; }
   .chip{
     flex:0 0 auto; padding:8px 14px; border-radius:20px; font-size:12.5px; font-weight:700;
     background:var(--bg-1); border:1px solid var(--line); color:var(--text-1); cursor:pointer;
   }
   .chip.active{ background:color-mix(in srgb, var(--gold) 20%, var(--bg-0)); border-color:var(--gold); color:var(--gold-2); }
 
-  /* ---- PRODUCT CARD ---- */
+  /* ---- YANGI FILTR TUGMASI (funnel ikonka) ---- */
+  .filter-btn{
+    display:flex; align-items:center; gap:8px; width:100%; margin-bottom:12px;
+    padding:12px 14px; border-radius:13px; background:var(--bg-1); border:1px solid var(--line);
+    color:var(--text-0); font-size:13.5px; font-weight:700; cursor:pointer;
+  }
+  .filter-btn .filter-ic{ font-size:15px; color:var(--gold-2); }
+  .filter-btn .filter-arrow{ margin-left:auto; color:var(--text-2); font-size:12px; }
+  .cat-pick-list{ display:flex; flex-direction:column; gap:6px; margin-top:6px; max-height:50vh; overflow-y:auto; }
+  .cat-pick-row{
+    display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:12px;
+    background:var(--bg-0); border:1px solid var(--line); cursor:pointer; font-size:14px; font-weight:700; color:var(--text-1);
+  }
+  .cat-pick-row .ic{ font-size:18px; }
+  .cat-pick-row.sel{ border-color:var(--gold); background:rgba(244,185,62,.1); color:var(--gold-2); }
+  .cat-pick-row .check{ margin-left:auto; opacity:0; color:var(--gold-2); font-weight:900; }
+  .cat-pick-row.sel .check{ opacity:1; }
+
+  /* ---- PRODUCT CARD (ro'yxat ko'rinishi — mening/admin bo'limlarida) ---- */
   .prod-list{ display:flex; flex-direction:column; gap:10px; }
   .prod-card{
     position:relative; display:flex; gap:12px; padding:12px 12px 12px 14px;
@@ -111,6 +130,7 @@
     background:color-mix(in srgb, var(--accent) 18%, var(--bg-0));
     border:1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
   }
+  .prod-icon.has-img{ object-fit:cover; }
   .prod-body{ flex:1; min-width:0; }
   .prod-name{ font-size:15px; font-weight:700; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
   .tag{ font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:8px; letter-spacing:.3px; }
@@ -129,6 +149,37 @@
   .mini-btn.del{ background:rgba(224,64,60,.16); color:#ff8b87; border:1px solid rgba(224,64,60,.4); }
   .mini-btn.pin{ background:rgba(244,185,62,.14); color:var(--gold-2); border:1px solid rgba(244,185,62,.35); }
   .mini-btn.blk{ background:var(--bg-0); color:var(--text-1); border:1px solid var(--line); }
+
+  /* ---- DO'KON: 2 USTUNLI TO'RTBURCHAK KARTALAR ---- */
+  .shop-grid{ display:grid !important; grid-template-columns:1fr 1fr; gap:10px; }
+  .shop-grid .empty-state{ grid-column:1 / -1; }
+  .prod-tile{
+    position:relative; display:flex; flex-direction:column; padding:12px; overflow:hidden;
+    background:linear-gradient(180deg, var(--bg-2), var(--bg-1)); border:1px solid var(--line); border-radius:16px;
+  }
+  .prod-tile::before{ content:""; position:absolute; left:0; right:0; top:0; height:4px; background:var(--accent, var(--gold)); }
+  .prod-tile.blocked{ opacity:.5; }
+  .prod-tile .tile-tags{ position:absolute; top:10px; right:10px; display:flex; flex-direction:column; gap:4px; align-items:flex-end; }
+  .prod-tile .prod-tile-icon{
+    width:100%; height:56px; border-radius:12px; font-size:26px; margin-bottom:8px;
+    display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--accent) 18%, var(--bg-0));
+    border:1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+  }
+  .prod-tile .prod-tile-img{ width:100%; height:96px; object-fit:cover; border-radius:12px; margin-bottom:8px; display:block; }
+  .prod-tile .prod-tile-name{ font-size:13.5px; font-weight:800; line-height:1.25; min-height:2.5em; }
+  .prod-tile .prod-tile-desc{ font-size:11px; color:var(--text-2); margin-top:4px; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .prod-tile .prod-tile-seller{ font-size:10.5px; color:var(--text-2); margin-top:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .prod-tile .prod-tile-price{ font-size:14px; font-weight:900; color:var(--accent, var(--gold)); margin-top:6px; }
+  .prod-tile .mini-btn{ width:100%; margin-top:9px; }
+
+  /* ---- SOZLAMALAR: TIL TUGMALARI ---- */
+  .lang-row{ display:flex; flex-direction:column; gap:8px; }
+  .lang-btn{
+    width:100%; text-align:left; padding:13px 14px; border-radius:12px; font-size:14px; font-weight:700;
+    background:var(--bg-0); border:1px solid var(--line); color:var(--text-1); cursor:pointer;
+  }
+  .lang-btn.active{ background:color-mix(in srgb, var(--gold) 18%, var(--bg-0)); border-color:var(--gold); color:var(--gold-2); }
 
   .fab{
     position:fixed; right:18px; bottom:96px; z-index:35;
@@ -189,6 +240,18 @@
     font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer;
   }
   .emoji-opt.sel{ border-color:var(--gold); background:rgba(244,185,62,.14); }
+
+  .photo-pick{ margin-top:8px; }
+  .photo-add-btn{
+    width:100%; padding:14px; border-radius:12px; background:var(--bg-0); border:1px dashed var(--line);
+    color:var(--text-1); font-size:13.5px; font-weight:700; cursor:pointer;
+  }
+  .photo-preview-wrap{ position:relative; width:100%; }
+  .photo-preview-img{ width:100%; max-height:180px; object-fit:cover; border-radius:12px; display:block; }
+  .photo-remove-btn{
+    position:absolute; top:8px; right:8px; width:28px; height:28px; border-radius:50%; border:none;
+    background:rgba(4,5,9,.75); color:#fff; font-size:14px; cursor:pointer;
+  }
 
   .submit-btn{
     width:100%; margin-top:16px; border:none; border-radius:14px; padding:14px;
@@ -262,7 +325,7 @@
 
 <div id="loadingScreen" class="loading-screen">
   <div class="spinner"></div>
-  <div class="txt">Bozor yuklanmoqda...</div>
+  <div class="txt" data-i18n="loading">Bozor yuklanmoqda...</div>
 </div>
 
 <header class="topbar">
@@ -274,45 +337,45 @@
 <main>
   <!-- ===================== MENU VIEW ===================== -->
   <section class="view" id="view-menu">
-    <p class="section-label">UMUMIY HOLAT</p>
+    <p class="section-label" data-i18n="overall">UMUMIY HOLAT</p>
     <div class="stat-grid">
-      <div class="stat-card"><div class="num" id="statProducts">0</div><div class="lbl">Faol mahsulot</div></div>
-      <div class="stat-card"><div class="num" id="statSellers">0</div><div class="lbl">Sotuvchilar</div></div>
-      <div class="stat-card"><div class="num" id="statOrders">0</div><div class="lbl">Jami buyurtma</div></div>
-      <div class="stat-card"><div class="num" id="statOfficial">0</div><div class="lbl">Rasmiy xizmat</div></div>
+      <div class="stat-card"><div class="num" id="statProducts">0</div><div class="lbl" data-i18n="stat_products">Faol mahsulot</div></div>
+      <div class="stat-card"><div class="num" id="statSellers">0</div><div class="lbl" data-i18n="stat_sellers">Sotuvchilar</div></div>
+      <div class="stat-card"><div class="num" id="statOrders">0</div><div class="lbl" data-i18n="stat_orders">Jami buyurtma</div></div>
+      <div class="stat-card"><div class="num" id="statOfficial">0</div><div class="lbl" data-i18n="stat_official">Rasmiy xizmat</div></div>
     </div>
 
     <div class="cta-row">
-      <button class="cta gold" id="ctaAdd"><span class="ic">➕</span>Mahsulot qo'yish</button>
-      <button class="cta ghost" id="ctaGoShop"><span class="ic">🛍️</span>Do'konga o'tish</button>
+      <button class="cta gold" id="ctaAdd"><span class="ic">➕</span><span data-i18n="add_product">Mahsulot qo'yish</span></button>
+      <button class="cta ghost" id="ctaGoShop"><span class="ic">🛍️</span><span data-i18n="go_shop">Do'konga o'tish</span></button>
     </div>
 
-    <p class="section-label">RASMIY XIZMATLAR</p>
+    <p class="section-label" data-i18n="official_services">RASMIY XIZMATLAR</p>
     <div class="hscroll" id="pinnedScroll"></div>
 
-    <p class="section-label">SO'NGGI QO'SHILGANLAR</p>
+    <p class="section-label" data-i18n="recent_added">SO'NGGI QO'SHILGANLAR</p>
     <div class="prod-list" id="recentList"></div>
   </section>
 
   <!-- ===================== SHOP VIEW ===================== -->
   <section class="view" id="view-shop" style="display:none;">
-    <div class="chip-row" id="chipRow">
-      <div class="chip active" data-cat="all">Hammasi</div>
-      <div class="chip" data-cat="xizmat">Xizmatlar</div>
-      <div class="chip" data-cat="tovar">Tovarlar</div>
-    </div>
-    <div class="prod-list" id="shopList"></div>
+    <button class="filter-btn" id="openFilterBtn">
+      <span class="filter-ic">☰</span>
+      <span id="filterBtnLabel">Hammasi</span>
+      <span class="filter-arrow">▾</span>
+    </button>
+    <div class="prod-list shop-grid" id="shopList"></div>
   </section>
 
   <!-- ===================== PROFILE VIEW ===================== -->
   <section class="view" id="view-profile" style="display:none;">
     <div id="noNameBlock">
-      <p class="section-label">PROFIL</p>
-      <label class="field">Ismingiz / nikingiz</label>
+      <p class="section-label" data-i18n="profil_title">PROFIL</p>
+      <label class="field" data-i18n="your_name">Ismingiz / nikingiz</label>
       <input class="field-input" id="fMyName" placeholder="Masalan: Sardor_99">
-      <label class="field">Telegram username (bog'lanish uchun)</label>
+      <label class="field" data-i18n="your_tg">Telegram username (bog'lanish uchun)</label>
       <input class="field-input" id="fMyTg" placeholder="@sizning_username">
-      <button class="submit-btn" id="saveNameBtn">Saqlash va davom etish</button>
+      <button class="submit-btn" id="saveNameBtn" data-i18n="save_continue">Saqlash va davom etish</button>
     </div>
 
     <div id="hasNameBlock" style="display:none;">
@@ -322,45 +385,58 @@
           <div class="nm" id="profileName">—</div>
           <div class="sub" id="profileTg">—</div>
         </div>
-        <button class="logout-btn" id="logoutBtn">Chiqish</button>
+        <button class="logout-btn" id="logoutBtn" data-i18n="logout">Chiqish</button>
       </div>
 
       <details class="collapse" id="secMyProducts">
-        <summary>📦 Mening mahsulotlarim <span class="cnt-badge" id="cntMyProducts">0</span><span class="arrow">⌄</span></summary>
+        <summary>📦 <span data-i18n="my_products">Mening mahsulotlarim</span> <span class="cnt-badge" id="cntMyProducts">0</span><span class="arrow">⌄</span></summary>
         <div class="collapse-body"><div class="prod-list" id="myProductsList"></div></div>
       </details>
 
       <details class="collapse" id="secIncoming">
-        <summary>📥 Menga tushgan buyurtmalar <span class="cnt-badge" id="cntIncoming">0</span><span class="arrow">⌄</span></summary>
+        <summary>📥 <span data-i18n="incoming_orders">Menga tushgan buyurtmalar</span> <span class="cnt-badge" id="cntIncoming">0</span><span class="arrow">⌄</span></summary>
         <div class="collapse-body"><div id="incomingOrdersList"></div></div>
       </details>
 
       <details class="collapse" id="secMyOrders">
-        <summary>🧾 Men bergan buyurtmalar <span class="cnt-badge" id="cntMyOrders">0</span><span class="arrow">⌄</span></summary>
+        <summary>🧾 <span data-i18n="my_orders">Men bergan buyurtmalar</span> <span class="cnt-badge" id="cntMyOrders">0</span><span class="arrow">⌄</span></summary>
         <div class="collapse-body"><div id="myOrdersList"></div></div>
       </details>
 
       <div class="admin-box" id="adminLoginBox">
-        <p class="section-label" style="margin-top:0;">ADMINISTRATOR</p>
-        <div class="muted" style="color:var(--text-1); font-size:12.5px; margin-bottom:10px;">Admin kodi orqali foydalanuvchilarni bloklash va mahsulotlarni boshqarish mumkin.</div>
+        <p class="section-label" style="margin-top:0;" data-i18n="administrator">ADMINISTRATOR</p>
+        <div class="muted" style="color:var(--text-1); font-size:12.5px; margin-bottom:10px;" data-i18n="admin_desc">Admin kodi orqali foydalanuvchilarni bloklash va mahsulotlarni boshqarish mumkin.</div>
         <div class="pin-input-row">
-          <input class="field-input" id="fPin" placeholder="Admin kodi" type="password" style="margin-top:0;">
-          <button class="submit-btn" id="pinSubmit" style="width:auto; margin-top:0; padding:0 18px;">Kirish</button>
+          <input class="field-input" id="fPin" placeholder="Admin kodi" data-i18n-ph="admin_code_ph" type="password" style="margin-top:0;">
+          <button class="submit-btn" id="pinSubmit" style="width:auto; margin-top:0; padding:0 18px;" data-i18n="enter">Kirish</button>
         </div>
       </div>
 
       <div id="adminPanel" style="display:none;">
-        <p class="admin-pill" style="display:block; width:fit-content; margin-bottom:10px;">🛡️ ADMIN PANEL</p>
+        <p class="admin-pill" style="display:block; width:fit-content; margin-bottom:10px;">🛡️ <span data-i18n="admin_panel">ADMIN PANEL</span></p>
 
         <details class="collapse admin-collapse" open>
-          <summary>👥 Foydalanuvchilar <span class="cnt-badge" id="usersCount">0</span><span class="arrow">⌄</span></summary>
+          <summary>👥 <span data-i18n="users">Foydalanuvchilar</span> <span class="cnt-badge" id="usersCount">0</span><span class="arrow">⌄</span></summary>
           <div class="collapse-body"><div id="userAdminList"></div></div>
         </details>
 
         <details class="collapse admin-collapse">
-          <summary>🗂️ Barcha mahsulotlar <span class="cnt-badge" id="cntAllProducts">0</span><span class="arrow">⌄</span></summary>
+          <summary>🗂️ <span data-i18n="all_products">Barcha mahsulotlar</span> <span class="cnt-badge" id="cntAllProducts">0</span><span class="arrow">⌄</span></summary>
           <div class="collapse-body"><div class="prod-list" id="adminProductsList"></div></div>
         </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SETTINGS VIEW ===================== -->
+  <section class="view" id="view-settings" style="display:none;">
+    <p class="section-label" data-i18n="settings_title">SOZLAMALAR</p>
+    <div class="admin-box" style="background:var(--bg-1); border-color:var(--line);">
+      <div class="muted" style="color:var(--text-1); font-size:12.5px; margin-bottom:12px;" data-i18n="settings_lang">Ilova tili</div>
+      <div class="lang-row" id="langRow">
+        <button class="lang-btn" data-lang="uz">🇺🇿 O'zbekcha</button>
+        <button class="lang-btn" data-lang="ru">🇷🇺 Русский</button>
+        <button class="lang-btn" data-lang="en">🇬🇧 English</button>
       </div>
     </div>
   </section>
@@ -369,9 +445,10 @@
 <button class="fab" id="fabAdd" style="display:none;">+</button>
 
 <nav class="tabbar">
-  <button class="tab-btn active" data-tab="menu"><span class="ic">🏠</span>Menyu</button>
-  <button class="tab-btn" data-tab="shop"><span class="ic">🛍️</span>Do'kon</button>
-  <button class="tab-btn" data-tab="profile"><span class="ic">👤</span>Profil</button>
+  <button class="tab-btn active" data-tab="menu"><span class="ic">🏠</span><span data-i18n="nav_menu">Menyu</span></button>
+  <button class="tab-btn" data-tab="shop"><span class="ic">🛍️</span><span data-i18n="nav_shop">Do'kon</span></button>
+  <button class="tab-btn" data-tab="profile"><span class="ic">👤</span><span data-i18n="nav_profile">Profil</span></button>
+  <button class="tab-btn" data-tab="settings"><span class="ic">⚙️</span><span data-i18n="nav_settings">Sozlamalar</span></button>
 </nav>
 
 <!-- ADD PRODUCT MODAL -->
@@ -379,28 +456,46 @@
   <div class="sheet">
     <div class="close-x" id="closeAdd">✕</div>
     <div class="sheet-handle"></div>
-    <h2 class="heavy">MAHSULOT QO'SHISH</h2>
-    <p class="muted">Sotmoqchi bo'lgan narsangizni bozorga qo'ying.</p>
+    <h2 class="heavy" data-i18n="add_modal_title">MAHSULOT QO'SHISH</h2>
+    <p class="muted" data-i18n="add_modal_desc">Sotmoqchi bo'lgan narsangizni bozorga qo'ying.</p>
 
-    <label class="field">Nomi</label>
-    <input class="field-input" id="pName" placeholder="Masalan: Uy-joy, Mashina, Xizmat...">
+    <label class="field" data-i18n="name_lbl">Nomi</label>
+    <input class="field-input" id="pName" placeholder="Masalan: Uy-joy, Mashina, Xizmat..." data-i18n-ph="name_ph">
 
-    <label class="field">Narxi (so'm)</label>
-    <input class="field-input" id="pPrice" type="number" placeholder="Masalan: 250000">
+    <label class="field" data-i18n="price_lbl">Narxi (so'm)</label>
+    <input class="field-input" id="pPrice" type="number" placeholder="Masalan: 250000" data-i18n-ph="price_ph">
 
-    <label class="field">Tavsif</label>
-    <textarea class="field-input" id="pDesc" placeholder="Qisqacha tavsif yozing"></textarea>
+    <label class="field" data-i18n="desc_lbl">Tavsif</label>
+    <textarea class="field-input" id="pDesc" placeholder="Qisqacha tavsif yozing" data-i18n-ph="desc_ph"></textarea>
 
-    <label class="field">Turkum</label>
-    <select class="field-input" id="pCat">
-      <option value="xizmat">Xizmat</option>
-      <option value="tovar">Tovar</option>
-    </select>
+    <label class="field" data-i18n="cat_lbl">Turkum</label>
+    <select class="field-input" id="pCat"></select>
 
-    <label class="field">Belgi tanlang</label>
+    <label class="field" data-i18n="pick_icon">Belgi tanlang</label>
     <div class="emoji-pick" id="emojiPick"></div>
 
-    <button class="submit-btn" id="submitProduct">Bozorga qo'yish</button>
+    <label class="field" data-i18n="photo_lbl">Rasm qo'shish (ixtiyoriy)</label>
+    <input type="file" accept="image/*" id="pImageInput" style="display:none;">
+    <div class="photo-pick" id="photoPick">
+      <button type="button" class="photo-add-btn" id="photoAddBtn">📷 <span data-i18n="add_photo">Rasm qo'shish</span></button>
+      <div class="photo-preview-wrap" id="photoPreviewWrap" style="display:none;">
+        <img id="photoPreviewImg" class="photo-preview-img">
+        <button type="button" class="photo-remove-btn" id="photoRemoveBtn">✕</button>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submitProduct" data-i18n="submit_market">Bozorga qo'yish</button>
+  </div>
+</div>
+
+<!-- FILTER (CATEGORY) MODAL -->
+<div class="overlay" id="filterOverlay">
+  <div class="sheet">
+    <div class="close-x" id="closeFilter">✕</div>
+    <div class="sheet-handle"></div>
+    <h2 class="heavy" data-i18n="choose_cat">TURKUM TANLANG</h2>
+    <div class="cat-pick-list" id="catPickList"></div>
+    <button class="submit-btn" id="filterOkBtn" data-i18n="ok_btn">Yaxshi</button>
   </div>
 </div>
 
@@ -410,22 +505,22 @@
     <div class="close-x" id="closeOrder">✕</div>
     <div class="sheet-handle"></div>
     <div id="orderFormView">
-      <h2 class="heavy">BUYURTMA BERISH</h2>
+      <h2 class="heavy" data-i18n="order_modal_title">BUYURTMA BERISH</h2>
       <p class="muted" id="orderProductLabel">—</p>
 
-      <label class="field">Izoh (ixtiyoriy)</label>
-      <textarea class="field-input" id="oNote" placeholder="Sotuvchiga xabar qoldiring"></textarea>
+      <label class="field" data-i18n="note_lbl">Izoh (ixtiyoriy)</label>
+      <textarea class="field-input" id="oNote" placeholder="Sotuvchiga xabar qoldiring" data-i18n-ph="note_ph"></textarea>
 
-      <button class="submit-btn" id="submitOrderBtn">🛒 Buyurtmani jo'natish</button>
+      <button class="submit-btn" id="submitOrderBtn" data-i18n="send_order">🛒 Buyurtmani jo'natish</button>
     </div>
     <div id="orderSuccessView" style="display:none;">
       <div class="success-wrap">
         <div class="check-circle">
           <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"></circle><path d="M15 27 L23 35 L38 18"></path></svg>
         </div>
-        <h3 class="heavy">BUYURTMA YUBORILDI!</h3>
-        <p style="color:var(--text-1); font-size:13.5px;">Sotuvchi buyurtmangizni ko'radi va siz bilan bog'lanadi.</p>
-        <button class="submit-btn" id="closeOrderSuccess" style="margin-top:16px;">Yaxshi</button>
+        <h3 class="heavy" data-i18n="order_sent_title">BUYURTMA YUBORILDI!</h3>
+        <p style="color:var(--text-1); font-size:13.5px;" data-i18n="order_sent_desc">Sotuvchi buyurtmangizni ko'radi va siz bilan bog'lanadi.</p>
+        <button class="submit-btn" id="closeOrderSuccess" style="margin-top:16px;" data-i18n="ok_btn">Yaxshi</button>
       </div>
     </div>
   </div>
@@ -444,6 +539,154 @@ const ADMIN_PIN = "7799";              // <-- shu kodni faqat o'zingiz biling, a
 const ADMIN_TELEGRAM_IDS = [7602467398];
 const ACCENTS = ["var(--red)","var(--blue)","var(--orange)","var(--green)","var(--purple)","var(--gold)"];
 const EMOJIS = ["🛡️","🚔","📡","⚕️","🔑","🏛️","⭐","🚗","🏠","📱","💎","🛠️","🎮","👕","🍔","📦"];
+
+// Turkumlar (kategoriyalar) — har birida sticker (emoji) va 3 tilda nomi bor.
+// Yangi turkum qo'shish uchun shu ro'yxatga bitta qator qo'shsangiz kifoya.
+const CATEGORIES = [
+  { id:"mashina", icon:"🚗", uz:"Mashina",        ru:"Машины",     en:"Cars" },
+  { id:"uyjoy",   icon:"🏠", uz:"Uy-joy",         ru:"Недвижимость", en:"Real Estate" },
+  { id:"kiyim",   icon:"👕", uz:"Kiyim-kechak",   ru:"Одежда",     en:"Clothing" },
+  { id:"qurol",   icon:"🔫", uz:"Qurol-yarog'",   ru:"Оружие",     en:"Weapons" },
+  { id:"xizmat",  icon:"🛠️", uz:"Xizmat",         ru:"Услуги",     en:"Services" },
+  { id:"texnika", icon:"📱", uz:"Texnika",        ru:"Техника",    en:"Electronics" },
+  { id:"boshqa",  icon:"📦", uz:"Boshqa",         ru:"Другое",     en:"Other" },
+];
+// Eski mahsulotlarda "tovar" turkumi ishlatilgan bo'lishi mumkin — uni "Boshqa"ga moslaymiz.
+function normalizeCat(cat){
+  if (CATEGORIES.some(c=>c.id===cat)) return cat;
+  return "boshqa";
+}
+function catInfo(cat){
+  return CATEGORIES.find(c=>c.id===normalizeCat(cat)) || CATEGORIES[CATEGORIES.length-1];
+}
+
+// ---------------- TIL (I18N) ----------------
+let currentLang = (function(){
+  try{ return localStorage.getItem("radmir_lang") || "uz"; }catch(e){ return "uz"; }
+})();
+const I18N = {
+  uz:{
+    nav_menu:"Menyu", nav_shop:"Do'kon", nav_profile:"Profil", nav_settings:"Sozlamalar",
+    overall:"UMUMIY HOLAT", stat_products:"Faol mahsulot", stat_sellers:"Sotuvchilar", stat_orders:"Jami buyurtma", stat_official:"Rasmiy xizmat",
+    add_product:"Mahsulot qo'yish", go_shop:"Do'konga o'tish",
+    official_services:"RASMIY XIZMATLAR", recent_added:"SO'NGGI QO'SHILGANLAR",
+    empty_recent:"Hozircha foydalanuvchilar mahsulot qo'shmagan",
+    all_cats:"Hammasi", empty_shop_cat:"Bu turkumda hozircha mahsulot yo'q",
+    order_btn:"Buyurtma berish", seller:"Sotuvchi",
+    official_tag:"RASMIY", blocked_tag:"BLOKLANGAN",
+    profil_title:"PROFIL", your_name:"Ismingiz / nikingiz", your_tg:"Telegram username (bog'lanish uchun)",
+    save_continue:"Saqlash va davom etish", logout:"Chiqish",
+    my_products:"Mening mahsulotlarim", incoming_orders:"Menga tushgan buyurtmalar", my_orders:"Men bergan buyurtmalar",
+    empty_my_products:"Siz hali mahsulot qo'ymagansiz", empty_incoming:"Sizga hali buyurtma tushmagan", empty_my_orders:"Siz hali buyurtma bermagansiz",
+    administrator:"ADMINISTRATOR", admin_desc:"Admin kodi orqali foydalanuvchilarni bloklash va mahsulotlarni boshqarish mumkin.",
+    admin_code_ph:"Admin kodi", enter:"Kirish", admin_panel:"ADMIN PANEL",
+    users:"Foydalanuvchilar", all_products:"Barcha mahsulotlar", empty_users:"Hali hech kim ilovani ochmagan",
+    remove:"O'chirish", block:"Bloklash", unblock:"Blokdan chiqarish", pin_off:"Yechish", pin_on:"Mahkamlash",
+    add_modal_title:"MAHSULOT QO'SHISH", add_modal_desc:"Sotmoqchi bo'lgan narsangizni bozorga qo'ying.",
+    name_lbl:"Nomi", name_ph:"Masalan: Uy-joy, Mashina, Xizmat...", price_lbl:"Narxi (so'm)", price_ph:"Masalan: 250000",
+    desc_lbl:"Tavsif", desc_ph:"Qisqacha tavsif yozing", cat_lbl:"Turkum", pick_icon:"Belgi tanlang", photo_lbl:"Rasm qo'shish (ixtiyoriy)", add_photo:"Rasm qo'shish", choose_cat:"TURKUM TANLANG", submit_market:"Bozorga qo'yish", saving:"Saqlanmoqda...",
+    order_modal_title:"BUYURTMA BERISH", note_lbl:"Izoh (ixtiyoriy)", note_ph:"Sotuvchiga xabar qoldiring", send_order:"🛒 Buyurtmani jo'natish", sending:"Yuborilmoqda...",
+    order_sent_title:"BUYURTMA YUBORILDI!", order_sent_desc:"Sotuvchi buyurtmangizni ko'radi va siz bilan bog'lanadi.", ok_btn:"Yaxshi",
+    settings_title:"SOZLAMALAR", settings_lang:"Ilova tili", contact_seller:"Telegramda yozish", mark_contacted:"Bog'landim deb belgilash",
+    buyer:"Xaridor", note_col:"Izoh", status_new:"Yangi", status_done:"Bog'lanildi",
+    toast_order_login:"Buyurtma berish uchun avval Profil bo'limida ismingizni kiriting",
+    toast_pinned_del:"Rasmiy mahsulotni faqat admin o'chira oladi", toast_added:"Mahsulot bozorga qo'yildi!", toast_deleted:"Mahsulot o'chirildi",
+    toast_enter_name:"Ismingizni kiriting", toast_welcome:"Xush kelibsiz, ", toast_admin_in:"Admin sifatida kirdingiz", toast_wrong_code:"Kod noto'g'ri",
+    toast_updated:"Yangilandi", toast_order_updated:"Buyurtma yangilandi", toast_save_error:"Saqlashda xatolik yuz berdi, internetni tekshiring",
+    toast_blocked_seller:"Siz administrator tomonidan bloklangansiz, mahsulot qo'sha olmaysiz",
+    toast_need_name_first:"Avval Profil bo'limida ismingizni kiriting",
+    toast_enter_pname:"Mahsulot nomini kiriting", toast_enter_price:"To'g'ri narx kiriting", loading:"Bozor yuklanmoqda...",
+  },
+  ru:{
+    nav_menu:"Меню", nav_shop:"Магазин", nav_profile:"Профиль", nav_settings:"Настройки",
+    overall:"ОБЩАЯ СТАТИСТИКА", stat_products:"Активные товары", stat_sellers:"Продавцы", stat_orders:"Всего заказов", stat_official:"Официальные услуги",
+    add_product:"Добавить товар", go_shop:"Перейти в магазин",
+    official_services:"ОФИЦИАЛЬНЫЕ УСЛУГИ", recent_added:"НЕДАВНО ДОБАВЛЕННЫЕ",
+    empty_recent:"Пока никто не добавил товар",
+    all_cats:"Все", empty_shop_cat:"В этой категории пока нет товаров",
+    order_btn:"Заказать", seller:"Продавец",
+    official_tag:"ОФИЦИАЛЬНО", blocked_tag:"ЗАБЛОКИРОВАНО",
+    profil_title:"ПРОФИЛЬ", your_name:"Ваше имя / ник", your_tg:"Telegram username (для связи)",
+    save_continue:"Сохранить и продолжить", logout:"Выйти",
+    my_products:"Мои товары", incoming_orders:"Входящие заказы", my_orders:"Мои заказы",
+    empty_my_products:"Вы ещё не добавили товар", empty_incoming:"Вам ещё не поступало заказов", empty_my_orders:"Вы ещё не делали заказ",
+    administrator:"АДМИНИСТРАТОР", admin_desc:"С помощью админ-кода можно блокировать пользователей и управлять товарами.",
+    admin_code_ph:"Админ-код", enter:"Войти", admin_panel:"АДМИН ПАНЕЛЬ",
+    users:"Пользователи", all_products:"Все товары", empty_users:"Пока никто не открыл приложение",
+    remove:"Удалить", block:"Заблокировать", unblock:"Разблокировать", pin_off:"Открепить", pin_on:"Закрепить",
+    add_modal_title:"ДОБАВИТЬ ТОВАР", add_modal_desc:"Разместите то, что хотите продать.",
+    name_lbl:"Название", name_ph:"Например: Дом, Машина, Услуга...", price_lbl:"Цена (сум)", price_ph:"Например: 250000",
+    desc_lbl:"Описание", desc_ph:"Краткое описание", cat_lbl:"Категория", pick_icon:"Выберите значок", photo_lbl:"Добавить фото (необязательно)", add_photo:"Добавить фото", choose_cat:"ВЫБЕРИТЕ КАТЕГОРИЮ", submit_market:"Опубликовать", saving:"Сохранение...",
+    order_modal_title:"ОФОРМИТЬ ЗАКАЗ", note_lbl:"Комментарий (необязательно)", note_ph:"Оставьте сообщение продавцу", send_order:"🛒 Отправить заказ", sending:"Отправка...",
+    order_sent_title:"ЗАКАЗ ОТПРАВЛЕН!", order_sent_desc:"Продавец увидит ваш заказ и свяжется с вами.", ok_btn:"Хорошо",
+    settings_title:"НАСТРОЙКИ", settings_lang:"Язык приложения", contact_seller:"Написать в Telegram", mark_contacted:"Отметить как связались",
+    buyer:"Покупатель", note_col:"Комментарий", status_new:"Новый", status_done:"Связались",
+    toast_order_login:"Чтобы сделать заказ, сначала укажите имя в профиле",
+    toast_pinned_del:"Официальный товар может удалить только админ", toast_added:"Товар опубликован!", toast_deleted:"Товар удалён",
+    toast_enter_name:"Введите ваше имя", toast_welcome:"Добро пожаловать, ", toast_admin_in:"Вы вошли как админ", toast_wrong_code:"Неверный код",
+    toast_updated:"Обновлено", toast_order_updated:"Заказ обновлён", toast_save_error:"Ошибка сохранения, проверьте интернет",
+    toast_blocked_seller:"Вы заблокированы администратором и не можете добавлять товары",
+    toast_need_name_first:"Сначала укажите имя в профиле",
+    toast_enter_pname:"Введите название товара", toast_enter_price:"Введите корректную цену", loading:"Загрузка магазина...",
+  },
+  en:{
+    nav_menu:"Menu", nav_shop:"Shop", nav_profile:"Profile", nav_settings:"Settings",
+    overall:"OVERVIEW", stat_products:"Active listings", stat_sellers:"Sellers", stat_orders:"Total orders", stat_official:"Official services",
+    add_product:"Add listing", go_shop:"Go to shop",
+    official_services:"OFFICIAL SERVICES", recent_added:"RECENTLY ADDED",
+    empty_recent:"No one has added a listing yet",
+    all_cats:"All", empty_shop_cat:"No listings in this category yet",
+    order_btn:"Order", seller:"Seller",
+    official_tag:"OFFICIAL", blocked_tag:"BLOCKED",
+    profil_title:"PROFILE", your_name:"Your name / nickname", your_tg:"Telegram username (for contact)",
+    save_continue:"Save and continue", logout:"Log out",
+    my_products:"My listings", incoming_orders:"Incoming orders", my_orders:"My orders",
+    empty_my_products:"You haven't listed anything yet", empty_incoming:"You have no incoming orders yet", empty_my_orders:"You haven't placed an order yet",
+    administrator:"ADMINISTRATOR", admin_desc:"Use the admin code to block users and manage listings.",
+    admin_code_ph:"Admin code", enter:"Enter", admin_panel:"ADMIN PANEL",
+    users:"Users", all_products:"All listings", empty_users:"No one has opened the app yet",
+    remove:"Remove", block:"Block", unblock:"Unblock", pin_off:"Unpin", pin_on:"Pin",
+    add_modal_title:"ADD LISTING", add_modal_desc:"List the item or service you want to sell.",
+    name_lbl:"Name", name_ph:"E.g. House, Car, Service...", price_lbl:"Price (sum)", price_ph:"E.g. 250000",
+    desc_lbl:"Description", desc_ph:"Write a short description", cat_lbl:"Category", pick_icon:"Choose an icon", photo_lbl:"Add photo (optional)", add_photo:"Add photo", choose_cat:"CHOOSE CATEGORY", submit_market:"Publish", saving:"Saving...",
+    order_modal_title:"PLACE ORDER", note_lbl:"Note (optional)", note_ph:"Leave a message for the seller", send_order:"🛒 Send order", sending:"Sending...",
+    order_sent_title:"ORDER SENT!", order_sent_desc:"The seller will see your order and contact you.", ok_btn:"OK",
+    settings_title:"SETTINGS", settings_lang:"App language", contact_seller:"Message on Telegram", mark_contacted:"Mark as contacted",
+    buyer:"Buyer", note_col:"Note", status_new:"New", status_done:"Contacted",
+    toast_order_login:"Please enter your name in Profile before ordering",
+    toast_pinned_del:"Only an admin can remove an official listing", toast_added:"Listing published!", toast_deleted:"Listing removed",
+    toast_enter_name:"Please enter your name", toast_welcome:"Welcome, ", toast_admin_in:"Logged in as admin", toast_wrong_code:"Incorrect code",
+    toast_updated:"Updated", toast_order_updated:"Order updated", toast_save_error:"Save error, please check your internet",
+    toast_blocked_seller:"You've been blocked by an admin and can't add listings",
+    toast_need_name_first:"Please enter your name in Profile first",
+    toast_enter_pname:"Please enter a listing name", toast_enter_price:"Please enter a valid price", loading:"Loading marketplace...",
+  },
+};
+function t(key){
+  return (I18N[currentLang] && I18N[currentLang][key]) || I18N.uz[key] || key;
+}
+function catLabel(cat){
+  const c = catInfo(cat);
+  return c[currentLang] || c.uz;
+}
+function setLang(lang){
+  if (!I18N[lang]) return;
+  currentLang = lang;
+  try{ localStorage.setItem("radmir_lang", lang); }catch(e){}
+  translatePage();
+  renderCategoryChips();
+  renderCategorySelect();
+  renderAll();
+  renderSettings();
+}
+function translatePage(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    el.textContent = t(el.getAttribute("data-i18n"));
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>{
+    el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph")));
+  });
+}
 
 const SEED_PRODUCTS = [
   { id:"fsb",  name:"FSB",         icon:"🛡️", price:700000, desc:"Davlat xavfsizlik tashkilotiga kirish xizmati.", cat:"xizmat", seller:"Radmir RP", tg:"uzbekovichh", pinned:true, blocked:false, createdAt:1 },
@@ -466,6 +709,7 @@ let isAdmin = false;
 let activeTab = "menu";
 let activeCat = "all";
 let selectedEmoji = EMOJIS[0];
+let selectedImageData = null; // yangi mahsulot uchun tanlangan rasm (base64), ixtiyoriy
 let pendingOrderProductId = null;
 
 // ---------------- STORAGE HELPERS (real backend API) ----------------
@@ -501,7 +745,7 @@ async function saveKey(key, value){
     return res.ok;
   }catch(e){
     console.error("Storage error on", key, e);
-    showToast("Saqlashda xatolik yuz berdi, internetni tekshiring");
+    showToast(t("toast_save_error") || "Saqlashda xatolik yuz berdi, internetni tekshiring");
     return false;
   }
 }
@@ -598,6 +842,58 @@ async function registerCurrentUser(){
   }catch(e){}
 }
 
+// ---------------- CATEGORY FILTER (funnel tugma + tanlov oynasi) ----------------
+let pendingFilterCat = "all";
+
+function catFilterLabel(catId){
+  if (catId === "all") return t("all_cats");
+  const c = catInfo(catId);
+  return c.icon + " " + (c[currentLang] || c.uz);
+}
+
+function renderCategoryChips(){
+  // Filtr tugmasidagi joriy tanlangan turkum nomini yangilaydi
+  document.getElementById("filterBtnLabel").textContent = catFilterLabel(activeCat);
+}
+
+function renderCategorySelect(){
+  const sel = document.getElementById("pCat");
+  const prevVal = sel.value || CATEGORIES[0].id;
+  sel.innerHTML = CATEGORIES.map(c=>`<option value="${c.id}">${c.icon} ${c[currentLang]||c.uz}</option>`).join("");
+  sel.value = CATEGORIES.some(c=>c.id===prevVal) ? prevVal : CATEGORIES[0].id;
+}
+
+function renderCatPickList(){
+  const list = document.getElementById("catPickList");
+  const allOptions = [{ id:"all", icon:"🗂️", label:t("all_cats") }]
+    .concat(CATEGORIES.map(c=>({ id:c.id, icon:c.icon, label:c[currentLang]||c.uz })));
+  list.innerHTML = allOptions.map(o=>`
+    <div class="cat-pick-row${pendingFilterCat===o.id?' sel':''}" data-cat="${o.id}">
+      <span class="ic">${o.icon}</span><span>${escapeHtml(o.label)}</span><span class="check">✓</span>
+    </div>
+  `).join("");
+}
+
+function openFilterModal(){
+  pendingFilterCat = activeCat;
+  renderCatPickList();
+  document.getElementById("filterOverlay").classList.add("open");
+}
+document.getElementById("openFilterBtn").addEventListener("click", ()=>{ haptic("light"); openFilterModal(); });
+document.getElementById("closeFilter").addEventListener("click", ()=> document.getElementById("filterOverlay").classList.remove("open"));
+document.getElementById("catPickList").addEventListener("click", (e)=>{
+  const row = e.target.closest(".cat-pick-row");
+  if (!row) return;
+  pendingFilterCat = row.dataset.cat;
+  renderCatPickList();
+});
+document.getElementById("filterOkBtn").addEventListener("click", ()=>{
+  activeCat = pendingFilterCat;
+  renderCategoryChips();
+  renderShop();
+  document.getElementById("filterOverlay").classList.remove("open");
+});
+
 // ---------------- INIT ----------------
 async function init(){
   products = await loadKey("marketplace-products", null);
@@ -616,8 +912,12 @@ async function init(){
   requestTelegramPhoneIfNeeded();
   await registerCurrentUser();
 
+  translatePage();
+  renderCategoryChips();
+  renderCategorySelect();
   buildEmojiPicker();
   renderAll();
+  renderSettings();
   document.getElementById("loadingScreen").style.opacity = "0";
   setTimeout(()=>{ document.getElementById("loadingScreen").style.display = "none"; }, 300);
 }
@@ -652,7 +952,7 @@ function renderMenu(){
   const recent = active.filter(p=>!p.pinned).sort((a,b)=>b.createdAt-a.createdAt).slice(0,4);
   recentList.innerHTML = "";
   if (recent.length === 0){
-    recentList.innerHTML = `<div class="empty-state"><span class="ic">🗃️</span>Hozircha foydalanuvchilar mahsulot qo'shmagan</div>`;
+    recentList.innerHTML = `<div class="empty-state"><span class="ic">🗃️</span>${t("empty_recent")}</div>`;
   } else {
     recent.forEach(p=> recentList.appendChild(buildProductCard(p, {mode:"shop"})));
   }
@@ -662,30 +962,76 @@ function renderShop(){
   const list = document.getElementById("shopList");
   list.innerHTML = "";
   let items = products.filter(p=>!p.blocked);
-  if (activeCat !== "all") items = items.filter(p=>p.cat === activeCat);
+  if (activeCat !== "all") items = items.filter(p=>normalizeCat(p.cat) === activeCat);
   items = items.slice().sort((a,b)=> (b.pinned - a.pinned) || (b.createdAt - a.createdAt));
 
   if (items.length === 0){
-    list.innerHTML = `<div class="empty-state"><span class="ic">🛒</span>Bu turkumda hozircha mahsulot yo'q</div>`;
+    list.innerHTML = `<div class="empty-state"><span class="ic">🛒</span>${t("empty_shop_cat")}</div>`;
     return;
   }
-  items.forEach(p=> list.appendChild(buildProductCard(p, {mode:"shop"})));
+  items.forEach(p=> list.appendChild(buildProductTile(p)));
 }
+
+// Do'kon uchun 2 ustunli, to'rtburchak shaklidagi ixcham karta
+function buildProductTile(p){
+  const tile = document.createElement("div");
+  tile.className = "prod-tile" + (p.blocked ? " blocked" : "");
+  tile.style.setProperty("--accent", accentFor(p.id));
+  const tags = [];
+  if (p.pinned) tags.push(`<span class="tag pin">${t("official_tag")}</span>`);
+  if (p.blocked) tags.push(`<span class="tag blk">${t("blocked_tag")}</span>`);
+
+  const mediaHtml = p.image
+    ? `<img class="prod-tile-img" src="${p.image}" alt="">`
+    : `<div class="prod-tile-icon">${p.icon}</div>`;
+
+  tile.innerHTML = `
+    <div class="tile-tags">${tags.join("")}</div>
+    ${mediaHtml}
+    <div class="prod-tile-name">${escapeHtml(p.name)}</div>
+    <div class="prod-tile-desc">${escapeHtml(p.desc||"")}</div>
+    <div class="prod-tile-seller">${t("seller")}: ${escapeHtml(p.seller)}</div>
+    <div class="prod-tile-price">${fmt(p.price)}</div>
+  `;
+  const buyBtn = document.createElement("button");
+  buyBtn.className = "mini-btn buy";
+  buyBtn.textContent = t("order_btn");
+  buyBtn.addEventListener("click", ()=> openOrderModal(p.id));
+  tile.appendChild(buyBtn);
+  return tile;
+}
+
+// ---------------- SETTINGS ----------------
+function renderSettings(){
+  document.querySelectorAll(".lang-btn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.lang === currentLang);
+  });
+}
+document.getElementById("langRow").addEventListener("click", (e)=>{
+  const btn = e.target.closest(".lang-btn");
+  if (!btn) return;
+  haptic("light");
+  setLang(btn.dataset.lang);
+});
 
 function buildProductCard(p, opts){
   const card = document.createElement("div");
   card.className = "prod-card" + (p.blocked ? " blocked" : "");
   card.style.setProperty("--accent", accentFor(p.id));
   const tags = [];
-  if (p.pinned) tags.push(`<span class="tag pin">RASMIY</span>`);
-  if (p.blocked) tags.push(`<span class="tag blk">BLOKLANGAN</span>`);
+  if (p.pinned) tags.push(`<span class="tag pin">${t("official_tag")}</span>`);
+  if (p.blocked) tags.push(`<span class="tag blk">${t("blocked_tag")}</span>`);
+
+  const mediaHtml = p.image
+    ? `<img class="prod-icon" style="object-fit:cover;" src="${p.image}" alt="">`
+    : `<div class="prod-icon">${p.icon}</div>`;
 
   card.innerHTML = `
-    <div class="prod-icon">${p.icon}</div>
+    ${mediaHtml}
     <div class="prod-body">
       <div class="prod-name">${escapeHtml(p.name)} ${tags.join(" ")}</div>
       <div class="prod-desc">${escapeHtml(p.desc||"")}</div>
-      <div class="prod-meta">Sotuvchi: ${escapeHtml(p.seller)}</div>
+      <div class="prod-meta">${t("seller")}: ${escapeHtml(p.seller)}</div>
       <div class="prod-price">${fmt(p.price)}</div>
       <div class="prod-actions" data-id="${p.id}"></div>
     </div>
@@ -695,18 +1041,18 @@ function buildProductCard(p, opts){
   if (opts.mode === "shop"){
     const buyBtn = document.createElement("button");
     buyBtn.className = "mini-btn buy";
-    buyBtn.textContent = "Buyurtma berish";
+    buyBtn.textContent = t("order_btn");
     buyBtn.addEventListener("click", ()=> openOrderModal(p.id));
     actions.appendChild(buyBtn);
   }
   if (opts.mode === "mine"){
     const delBtn = document.createElement("button");
     delBtn.className = "mini-btn del";
-    delBtn.textContent = "O'chirish";
+    delBtn.textContent = t("remove");
     if (p.pinned && !isAdmin){
       delBtn.disabled = true;
       delBtn.style.opacity = ".4";
-      delBtn.title = "Rasmiy mahsulotni faqat admin o'chira oladi";
+      delBtn.title = t("toast_pinned_del");
     } else {
       delBtn.addEventListener("click", ()=> deleteProduct(p.id));
     }
@@ -715,19 +1061,19 @@ function buildProductCard(p, opts){
   if (opts.mode === "admin"){
     const pinBtn = document.createElement("button");
     pinBtn.className = "mini-btn pin";
-    pinBtn.textContent = p.pinned ? "Yechish" : "Mahkamlash";
+    pinBtn.textContent = p.pinned ? t("pin_off") : t("pin_on");
     pinBtn.addEventListener("click", ()=> togglePin(p.id));
     actions.appendChild(pinBtn);
 
     const blkBtn = document.createElement("button");
     blkBtn.className = "mini-btn blk";
-    blkBtn.textContent = p.blocked ? "Ochish" : "Bloklash";
+    blkBtn.textContent = p.blocked ? t("unblock") : t("block");
     blkBtn.addEventListener("click", ()=> toggleBlockProduct(p.id));
     actions.appendChild(blkBtn);
 
     const delBtn = document.createElement("button");
     delBtn.className = "mini-btn del";
-    delBtn.textContent = "O'chirish";
+    delBtn.textContent = t("remove");
     delBtn.addEventListener("click", ()=> deleteProduct(p.id));
     actions.appendChild(delBtn);
   }
@@ -748,7 +1094,7 @@ function renderProfile(){
   const myList = document.getElementById("myProductsList");
   myList.innerHTML = "";
   if (myProducts.length === 0){
-    myList.innerHTML = `<div class="empty-state"><span class="ic">📦</span>Siz hali mahsulot qo'ymagansiz</div>`;
+    myList.innerHTML = `<div class="empty-state"><span class="ic">📦</span>${t("empty_my_products")}</div>`;
   } else {
     myProducts.forEach(p=> myList.appendChild(buildProductCard(p, {mode:"mine"})));
   }
@@ -758,7 +1104,7 @@ function renderProfile(){
   const inWrap = document.getElementById("incomingOrdersList");
   inWrap.innerHTML = "";
   if (incoming.length === 0){
-    inWrap.innerHTML = `<div class="empty-state"><span class="ic">📭</span>Sizga hali buyurtma tushmagan</div>`;
+    inWrap.innerHTML = `<div class="empty-state"><span class="ic">📭</span>${t("empty_incoming")}</div>`;
   } else {
     incoming.forEach(o=> inWrap.appendChild(buildOrderCard(o, true)));
   }
@@ -768,7 +1114,7 @@ function renderProfile(){
   const myOWrap = document.getElementById("myOrdersList");
   myOWrap.innerHTML = "";
   if (mine.length === 0){
-    myOWrap.innerHTML = `<div class="empty-state"><span class="ic">🧾</span>Siz hali buyurtma bermagansiz</div>`;
+    myOWrap.innerHTML = `<div class="empty-state"><span class="ic">🧾</span>${t("empty_my_orders")}</div>`;
   } else {
     mine.forEach(o=> myOWrap.appendChild(buildOrderCard(o, false)));
   }
@@ -787,11 +1133,11 @@ function buildOrderCard(o, isSeller){
   card.innerHTML = `
     <div class="top-row">
       <div class="prod">${escapeHtml(o.productName)}</div>
-      <span class="status-badge ${o.status==='done'?'done':'new'}">${o.status==='done' ? "Bog'lanildi" : "Yangi"}</span>
+      <span class="status-badge ${o.status==='done'?'done':'new'}">${o.status==='done' ? t("status_done") : t("status_new")}</span>
     </div>
     <div class="meta">
-      <b>${isSeller ? "Xaridor" : "Sotuvchi"}:</b> ${escapeHtml(otherName)} ${otherTg ? "(@"+escapeHtml(otherTg.replace(/^@/,""))+")" : ""}<br>
-      ${o.note ? "<b>Izoh:</b> " + escapeHtml(o.note) : ""}
+      <b>${isSeller ? t("buyer") : t("seller")}:</b> ${escapeHtml(otherName)} ${otherTg ? "(@"+escapeHtml(otherTg.replace(/^@/,""))+")" : ""}<br>
+      ${o.note ? "<b>" + t("note_col") + ":</b> " + escapeHtml(o.note) : ""}
     </div>
     <div class="prod-actions" style="margin-top:8px;"></div>
   `;
@@ -799,14 +1145,14 @@ function buildOrderCard(o, isSeller){
   if (otherTg){
     const contactBtn = document.createElement("button");
     contactBtn.className = "mini-btn buy";
-    contactBtn.textContent = "Telegramda yozish";
+    contactBtn.textContent = t("contact_seller");
     contactBtn.addEventListener("click", ()=> window.open("https://t.me/"+otherTg.replace(/^@/,""), "_blank"));
     actions.appendChild(contactBtn);
   }
   if (isSeller && o.status !== "done"){
     const doneBtn = document.createElement("button");
     doneBtn.className = "mini-btn blk";
-    doneBtn.textContent = "Bog'landim deb belgilash";
+    doneBtn.textContent = t("mark_contacted");
     doneBtn.addEventListener("click", ()=> markOrderDone(o.id));
     actions.appendChild(doneBtn);
   }
@@ -827,7 +1173,7 @@ function renderAdminPanel(){
   document.getElementById("usersCount").textContent = usersToShow.length;
 
   if (usersToShow.length === 0){
-    userList.innerHTML = `<div class="empty-state"><span class="ic">👥</span>Hali hech kim ilovani ochmagan</div>`;
+    userList.innerHTML = `<div class="empty-state"><span class="ic">👥</span>${t("empty_users")}</div>`;
   } else {
     usersToShow.forEach(u=>{
       const name = u.name;
@@ -838,7 +1184,7 @@ function renderAdminPanel(){
       row.innerHTML = `<div class="un">${escapeHtml(name)} ${u.tg ? `<span class="cnt">@${escapeHtml(u.tg.replace(/^@/,""))}</span>` : ""} <span class="cnt">· ${prodCount} ta mahsulot</span></div>`;
       const btn = document.createElement("button");
       btn.className = "mini-btn " + (blocked ? "buy" : "del");
-      btn.textContent = blocked ? "Blokdan chiqarish" : "Bloklash";
+      btn.textContent = blocked ? t("unblock") : t("block");
       btn.addEventListener("click", ()=> toggleBlockSeller(name));
       row.appendChild(btn);
       userList.appendChild(row);
@@ -863,6 +1209,7 @@ function switchTab(tab){
   document.getElementById("view-menu").style.display = tab === "menu" ? "block" : "none";
   document.getElementById("view-shop").style.display = tab === "shop" ? "block" : "none";
   document.getElementById("view-profile").style.display = tab === "profile" ? "block" : "none";
+  document.getElementById("view-settings").style.display = tab === "settings" ? "block" : "none";
   document.querySelectorAll(".tab-btn").forEach(b=> b.classList.toggle("active", b.dataset.tab === tab));
   document.getElementById("fabAdd").style.display = tab === "shop" ? "flex" : "none";
 }
@@ -888,15 +1235,54 @@ function buildEmojiPicker(){
   });
 }
 
+// ---------------- PHOTO PICKER (mahsulotga rasm qo'shish, ixtiyoriy) ----------------
+// Tanlangan rasm katta bo'lmasligi uchun avtomatik kichraytiriladi va siqiladi
+// (max 700px kenglik, JPEG ~72% sifat), shunda data.json fayli tez shishib ketmaydi.
+function resetPhotoPicker(){
+  selectedImageData = null;
+  document.getElementById("pImageInput").value = "";
+  document.getElementById("photoAddBtn").style.display = "block";
+  document.getElementById("photoPreviewWrap").style.display = "none";
+}
+document.getElementById("photoAddBtn").addEventListener("click", ()=>{
+  document.getElementById("pImageInput").click();
+});
+document.getElementById("pImageInput").addEventListener("change", (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const maxW = 700;
+      const scale = Math.min(1, maxW / img.width);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      selectedImageData = canvas.toDataURL("image/jpeg", 0.72);
+      document.getElementById("photoPreviewImg").src = selectedImageData;
+      document.getElementById("photoAddBtn").style.display = "none";
+      document.getElementById("photoPreviewWrap").style.display = "block";
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById("photoRemoveBtn").addEventListener("click", ()=>{
+  resetPhotoPicker();
+});
+
 // ---------------- ADD PRODUCT ----------------
 function openAddModal(){
   if (!myName){
-    showToast("Avval Profil bo'limida ismingizni kiriting");
+    showToast(t("toast_need_name_first"));
     switchTab("profile");
     return;
   }
   if (blockedSellers.includes(myName)){
-    showToast("Siz administrator tomonidan bloklangansiz, mahsulot qo'sha olmaysiz");
+    showToast(t("toast_blocked_seller"));
     return;
   }
   document.getElementById("pName").value = "";
@@ -905,6 +1291,7 @@ function openAddModal(){
   document.getElementById("pCat").value = "xizmat";
   selectedEmoji = EMOJIS[0];
   buildEmojiPicker();
+  resetPhotoPicker();
   document.getElementById("addOverlay").classList.add("open");
 }
 document.getElementById("ctaAdd").addEventListener("click", openAddModal);
@@ -917,16 +1304,17 @@ document.getElementById("submitProduct").addEventListener("click", async ()=>{
   const desc = document.getElementById("pDesc").value.trim();
   const cat = document.getElementById("pCat").value;
 
-  if (!name){ showToast("Mahsulot nomini kiriting"); return; }
-  if (!price || price <= 0){ showToast("To'g'ri narx kiriting"); return; }
+  if (!name){ showToast(t("toast_enter_pname")); return; }
+  if (!price || price <= 0){ showToast(t("toast_enter_price")); return; }
 
   const btn = document.getElementById("submitProduct");
-  btn.disabled = true; btn.textContent = "Saqlanmoqda...";
+  btn.disabled = true; btn.textContent = t("saving");
 
   const newProduct = {
     id: "p" + Date.now(),
     name, price, desc, cat,
     icon: selectedEmoji,
+    image: selectedImageData || null,
     seller: myName,
     tg: myTg,
     pinned: false,
@@ -935,12 +1323,12 @@ document.getElementById("submitProduct").addEventListener("click", async ()=>{
   };
   products.push(newProduct);
   const ok = await saveKey("marketplace-products", products);
-  btn.disabled = false; btn.textContent = "Bozorga qo'yish";
+  btn.disabled = false; btn.textContent = t("submit_market");
 
   if (ok){
     document.getElementById("addOverlay").classList.remove("open");
     haptic("medium");
-    showToast("Mahsulot bozorga qo'yildi!");
+    showToast(t("toast_added"));
     renderAll();
   } else {
     products.pop();
@@ -950,17 +1338,17 @@ document.getElementById("submitProduct").addEventListener("click", async ()=>{
 async function deleteProduct(id){
   const p = products.find(x=>x.id===id);
   if (!p) return;
-  if (p.pinned && !isAdmin){ showToast("Rasmiy mahsulotni faqat admin o'chira oladi"); return; }
+  if (p.pinned && !isAdmin){ showToast(t("toast_pinned_del")); return; }
   const backup = products.slice();
   products = products.filter(x=>x.id!==id);
   const ok = await saveKey("marketplace-products", products);
-  if (ok){ showToast("Mahsulot o'chirildi"); renderAll(); } else { products = backup; }
+  if (ok){ showToast(t("toast_deleted")); renderAll(); } else { products = backup; }
 }
 
 // ---------------- ORDER ----------------
 function openOrderModal(productId){
   if (!myName){
-    showToast("Buyurtma berish uchun avval Profil bo'limida ismingizni kiriting");
+    showToast(t("toast_order_login"));
     switchTab("profile");
     return;
   }
@@ -981,7 +1369,7 @@ document.getElementById("submitOrderBtn").addEventListener("click", async ()=>{
   const note = document.getElementById("oNote").value.trim();
 
   const btn = document.getElementById("submitOrderBtn");
-  btn.disabled = true; btn.textContent = "Yuborilmoqda...";
+  btn.disabled = true; btn.textContent = t("sending");
 
   const newOrder = {
     id: "o" + Date.now(),
@@ -997,7 +1385,7 @@ document.getElementById("submitOrderBtn").addEventListener("click", async ()=>{
   };
   orders.push(newOrder);
   const ok = await saveKey("marketplace-orders", orders);
-  btn.disabled = false; btn.textContent = "🛒 Buyurtmani jo'natish";
+  btn.disabled = false; btn.textContent = t("send_order");
 
   if (ok){
     haptic("medium");
@@ -1024,28 +1412,18 @@ async function markOrderDone(orderId){
   if (!o) return;
   o.status = "done";
   const ok = await saveKey("marketplace-orders", orders);
-  if (ok){ showToast("Buyurtma yangilandi"); renderAll(); }
+  if (ok){ showToast(t("toast_order_updated")); renderAll(); }
 }
-
-// ---------------- CHIPS ----------------
-document.getElementById("chipRow").addEventListener("click", (e)=>{
-  const chip = e.target.closest(".chip");
-  if (!chip) return;
-  activeCat = chip.dataset.cat;
-  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
-  chip.classList.add("active");
-  renderShop();
-});
 
 // ---------------- PROFILE: NAME ----------------
 document.getElementById("saveNameBtn").addEventListener("click", ()=>{
   const name = document.getElementById("fMyName").value.trim();
   const tgu = document.getElementById("fMyTg").value.trim();
-  if (!name){ showToast("Ismingizni kiriting"); return; }
+  if (!name){ showToast(t("toast_enter_name")); return; }
   myName = name;
   myTg = tgu;
   renderAll();
-  showToast("Xush kelibsiz, " + name + "!");
+  showToast(t("toast_welcome") + name + "!");
 });
 document.getElementById("logoutBtn").addEventListener("click", ()=>{
   myName = ""; myTg = ""; isAdmin = false;
@@ -1060,10 +1438,10 @@ document.getElementById("pinSubmit").addEventListener("click", ()=>{
   if (val === ADMIN_PIN){
     isAdmin = true;
     document.getElementById("fPin").value = "";
-    showToast("Admin sifatida kirdingiz");
+    showToast(t("toast_admin_in"));
     renderAll();
   } else {
-    showToast("Kod noto'g'ri");
+    showToast(t("toast_wrong_code"));
   }
 });
 
@@ -1088,7 +1466,7 @@ async function toggleBlockSeller(name){
     blockedSellers.push(name);
   }
   const ok = await saveKey("marketplace-blocked", blockedSellers);
-  if (ok){ showToast("Yangilandi"); renderAll(); }
+  if (ok){ showToast(t("toast_updated")); renderAll(); }
 }
 
 init();
