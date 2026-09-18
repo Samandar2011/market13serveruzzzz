@@ -1,13 +1,7 @@
 {
-  "name": "radmir-market-bot",
-  "version": "2.0.0",
-  "description": "RADMIR MARKET Telegram bot + saqlanadigan ma'lumotlar bilan server",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.19.2",
-    "node-telegram-bot-api": "^0.66.0"
-  }
+  "name": "cefr-master",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "start": "node server.js", "dev": "node --watch server.js" },
+  "engines": { "node": ">=20" }
 }
