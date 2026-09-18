@@ -19,10 +19,7 @@ Open `http://localhost:3000`.
 
 The free plan may sleep when idle. The included `render.yaml` uses a small persistent disk, so use a paid Render plan if the disk is required in production.
 
-| Account | Login | Password |
-|---|---|---|
-| Student | `student@cefrmaster.uz` | `Student@2026` |
-| Admin | `admin@cefrmaster.uz` | `Admin@2026` |
+\
 
 The server creates `data.json` on first run. It holds local development data and is intentionally excluded from source control. Passwords are salted `scrypt` hashes.
 
